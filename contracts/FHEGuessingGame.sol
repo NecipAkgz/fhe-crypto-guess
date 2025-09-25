@@ -102,32 +102,33 @@ contract FHEGuessingGame is SepoliaConfig {
 
     /// @notice Get the result of a completed game
     /// @param gameId The game ID
-    /// @return won True if player won, false otherwise
-    /// @return revealedChoice The computer's choice (only revealed if player won)
-    function getResult(uint256 gameId) external view returns (bool won, uint256 revealedChoice) {
+    /// @return won Encrypted boolean indicating if player won
+    /// @return revealedChoice Encrypted computer choice (decrypt off-chain)
+    function getResult(uint256 gameId) external returns (ebool won, euint32 revealedChoice) {
         Game storage game = games[gameId];
 
         require(game.state == GameState.Completed, "Game not completed");
         require(game.player == msg.sender, "Not your game");
 
-        // For demo purposes, we'll use a simple approach
-        // In a real FHE implementation, this would be done with encrypted comparison
-        won = false; // This would be determined by encrypted comparison
-        revealedChoice = 999; // This would be revealed only if won
+        // Compare encrypted guess with encrypted computer choice using FHE
+        ebool isEqual = FHE.eq(game.playerGuess, game.computerChoice);
+
+        // Return encrypted results - decrypt off-chain using FHEVM SDK
+        won = isEqual;
+        revealedChoice = game.computerChoice;
     }
 
     /// @notice Reveal the computer's choice (only callable if player won)
     /// @param gameId The game ID
-    /// @return computerChoice The decrypted computer choice
-    function revealChoice(uint256 gameId) external view returns (uint256 computerChoice) {
+    /// @return computerChoice Encrypted computer choice (decrypt off-chain)
+    function revealChoice(uint256 gameId) external view returns (euint32 computerChoice) {
         Game storage game = games[gameId];
 
         require(game.state == GameState.Completed, "Game not completed");
         require(game.player == msg.sender, "Not your game");
 
-        // For demo purposes, return a fixed value
-        // In a real FHE implementation, this would decrypt the actual choice
-        computerChoice = 0; // This would be the actual decrypted choice
+        // Return encrypted computer choice - decrypt off-chain using FHEVM SDK
+        computerChoice = game.computerChoice;
     }
 
     /// @notice Get all games for a player
