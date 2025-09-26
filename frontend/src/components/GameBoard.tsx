@@ -6,6 +6,12 @@ import { startNewGame, makeGuess, getGameResult, checkServices } from "@/lib/gam
 import { type ServiceStatus } from "@/lib/serviceStatus";
 import { ethers } from "ethers";
 
+const choices = [
+  { id: 0, label: "Rock", icon: "🪨", tone: "from-slate-200/80 via-slate-50 to-slate-100" },
+  { id: 1, label: "Paper", icon: "📄", tone: "from-stone-200/70 via-white to-stone-100" },
+  { id: 2, label: "Scissors", icon: "✂️", tone: "from-zinc-200/80 via-white to-zinc-100" },
+];
+
 export default function GameBoard() {
   const { address, isConnected, connectWallet } = useWallet();
   const [gameId, setGameId] = useState<number | null>(null);
@@ -83,98 +89,102 @@ export default function GameBoard() {
     }
   };
 
-  return (
-    <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
-      <h1 className="text-2xl font-bold text-center mb-6 text-gray-800">
-        FHE Guessing Game
-      </h1>
+  const primaryButton =
+    "w-full rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400";
+  const subtleButton =
+    "rounded-full border border-slate-200 px-5 py-3 text-sm font-medium text-slate-600 transition-colors hover:border-slate-900 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50";
 
-      {/* Service Status Banner */}
+  return (
+    <section className="flex w-full flex-col gap-6 rounded-2xl border border-slate-200 bg-white/90 p-8">
+      <header className="space-y-2">
+        <h2 className="text-xl font-semibold text-slate-900">Play a round</h2>
+        <p className="text-sm text-slate-500">
+          Start an encrypted match and keep every move hidden from the contract.
+        </p>
+      </header>
+
       {serviceStatus && (
-        <div className={`mb-4 p-3 rounded-lg text-sm ${
-          demoMode
-            ? 'bg-yellow-100 text-yellow-800 border border-yellow-300'
-            : 'bg-green-100 text-green-800 border border-green-300'
-        }`}>
-          {demoMode ? (
-            <div className="flex items-center justify-center">
-              <span className="mr-2">⚠️</span>
-              <span>
-                Demo Mode: FHEVM service temporarily unavailable.
-                Game will work with mock data.
-              </span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center">
-              <span className="mr-2">✅</span>
-              <span>All services operational</span>
-            </div>
-          )}
+        <div
+          className={`rounded-xl border px-4 py-3 text-sm ${
+            demoMode
+              ? "border-amber-200 bg-amber-50 text-amber-700"
+              : "border-emerald-200 bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          <p className="font-medium">{demoMode ? "Demo mode" : "Services online"}</p>
+          <p className="mt-1 text-xs opacity-80">
+            {demoMode
+              ? "FHEVM service is offline; mock responses keep the flow available."
+              : "All systems are operational. Moves stay encrypted throughout."}
+          </p>
         </div>
       )}
 
       {!isConnected ? (
-        <div className="text-center">
-          <p className="text-gray-600 mb-4">Connect your wallet to play</p>
-          <button
-            onClick={connectWallet}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-          >
+        <div className="flex flex-col gap-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center">
+          <p className="text-sm text-slate-600">Connect your wallet to begin.</p>
+          <button onClick={connectWallet} className={primaryButton}>
             Connect Wallet
           </button>
         </div>
       ) : (
-        <div>
-          <div className="text-center mb-6">
-            <p className="text-gray-600">Connected: {address?.slice(0, 6)}...{address?.slice(-4)}</p>
+        <div className="flex flex-col gap-6">
+          <div className="flex items-center justify-between rounded-xl bg-slate-50 px-5 py-3 text-xs text-slate-500">
+            <span>Connected</span>
+            <span className="font-medium text-slate-700">
+              {address?.slice(0, 6)}…{address?.slice(-4)}
+            </span>
           </div>
 
           {!gameId ? (
-            <div className="text-center">
-              <button
-                onClick={handleStartGame}
-                disabled={loading}
-                className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-bold py-3 px-6 rounded-lg text-lg"
-              >
-                {loading ? "Starting Game..." : "Start New Game"}
-              </button>
-            </div>
+            <button
+              onClick={handleStartGame}
+              disabled={loading}
+              className={primaryButton}
+            >
+              {loading ? "Starting…" : "Start New Game"}
+            </button>
           ) : (
-            <div>
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-semibold mb-4">Make Your Choice</h2>
-                <div className="flex justify-center space-x-4">
-                  <button
-                    onClick={() => handleMakeGuess(0)}
-                    disabled={loading}
-                    className="bg-red-500 hover:bg-red-600 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded"
-                  >
-                    Rock
-                  </button>
-                  <button
-                    onClick={() => handleMakeGuess(1)}
-                    disabled={loading}
-                    className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded"
-                  >
-                    Paper
-                  </button>
-                  <button
-                    onClick={() => handleMakeGuess(2)}
-                    disabled={loading}
-                    className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded"
-                  >
-                    Scissors
-                  </button>
+            <div className="flex flex-col gap-6">
+              <div className="space-y-3 text-center">
+                <h3 className="text-sm font-medium uppercase tracking-[0.3em] text-slate-500">
+                  Make your move
+                </h3>
+                <div className="flex flex-wrap justify-center gap-6">
+                  {choices.map((choice) => (
+                    <button
+                      key={choice.id}
+                      onClick={() => handleMakeGuess(choice.id)}
+                      disabled={loading}
+                      className="group flex flex-col items-center gap-3 text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 disabled:cursor-not-allowed disabled:opacity-60"
+                      aria-label={choice.label}
+                    >
+                      <span
+                        className={`flex h-36 w-24 flex-col items-center justify-center rounded-3xl border border-slate-200 bg-gradient-to-br ${choice.tone} text-4xl shadow-sm transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-lg group-focus-visible:-translate-y-1 group-focus-visible:shadow-lg`}
+                      >
+                        {choice.icon}
+                      </span>
+                      <span className="text-xs font-medium uppercase tracking-[0.3em] text-slate-400">
+                        {choice.label}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
               {result && (
-                <div className="text-center p-4 bg-gray-100 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-2">Result</h3>
-                  <p className={`text-xl font-bold ${result.won ? 'text-green-600' : 'text-red-600'}`}>
-                    {result.won ? "You Won! 🎉" : "You Lost 😔"}
+                <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-5 text-center">
+                  <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
+                    Result
                   </p>
-                  <p className="text-gray-600">
+                  <p
+                    className={`text-lg font-semibold ${
+                      result.won ? "text-emerald-600" : "text-rose-600"
+                    }`}
+                  >
+                    {result.won ? "You won" : "You lost"}
+                  </p>
+                  <p className="text-sm text-slate-600">
                     Computer chose: {getChoiceName(result.choice)}
                   </p>
                   <button
@@ -182,9 +192,9 @@ export default function GameBoard() {
                       setGameId(null);
                       setResult(null);
                     }}
-                    className="mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
+                    className={subtleButton}
                   >
-                    Play Again
+                    Play again
                   </button>
                 </div>
               )}
@@ -193,20 +203,24 @@ export default function GameBoard() {
         </div>
       )}
 
-      <div className="mt-8 text-center text-sm text-gray-500">
+      <footer className="rounded-xl bg-slate-50 px-5 py-4 text-xs leading-relaxed text-slate-500">
         {demoMode ? (
           <>
-            <p>🔄 Demo Mode Active</p>
-            <p>FHEVM service temporarily unavailable</p>
-            <p className="text-xs mt-1">Using mock encryption for demonstration</p>
+            <p className="font-medium text-slate-700">Demo mode active</p>
+            <p className="mt-1">
+              Real FHE execution is paused. Interactions mimic encrypted flow without the
+              live service.
+            </p>
           </>
         ) : (
           <>
-            <p>🔒 Powered by Fully Homomorphic Encryption</p>
-            <p>Your choices are encrypted and secure</p>
+            <p className="font-medium text-slate-700">Encrypted end-to-end</p>
+            <p className="mt-1">
+              Inputs are sealed locally and never leave your device in plain text.
+            </p>
           </>
         )}
-      </div>
-    </div>
+      </footer>
+    </section>
   );
 }
