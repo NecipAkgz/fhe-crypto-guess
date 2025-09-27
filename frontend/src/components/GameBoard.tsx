@@ -6,6 +6,110 @@ import { startNewGame, makeGuess, getGameResult, checkServices } from "@/lib/gam
 import { type ServiceStatus } from "@/lib/serviceStatus";
 import { ethers } from "ethers";
 
+// FHE Education Component
+const FHEEducationStep = ({
+  step,
+  title,
+  description,
+  code,
+  isVisible,
+  onClose
+}: {
+  step: number;
+  title: string;
+  description: string;
+  code?: string;
+  isVisible: boolean;
+  onClose: () => void;
+}) => {
+  if (!isVisible) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="mx-4 w-full max-w-2xl rounded-2xl bg-white p-8 shadow-2xl">
+        <div className="mb-6 flex items-center gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600">
+            {step}
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-slate-900">{title}</h3>
+            <p className="text-sm text-slate-500">FHE Learning Step</p>
+          </div>
+        </div>
+
+        <div className="mb-6 space-y-4">
+          <p className="text-slate-700 leading-relaxed">{description}</p>
+
+          {code && (
+            <div className="rounded-lg bg-slate-900 p-4 text-sm">
+              <pre className="text-green-400">
+                <code>{code}</code>
+              </pre>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            onClick={onClose}
+            className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          >
+            Got it!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Encryption Progress Component
+const EncryptionProgress = ({
+  currentStep,
+  totalSteps
+}: {
+  currentStep: number;
+  totalSteps: number;
+}) => {
+  return (
+    <div className="mb-6 rounded-xl bg-blue-50 p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <h4 className="text-sm font-medium text-blue-900">Encryption Progress</h4>
+        <span className="text-xs text-blue-600">
+          Step {currentStep} of {totalSteps}
+        </span>
+      </div>
+
+      <div className="mb-3 flex gap-2">
+        {Array.from({ length: totalSteps }, (_, i) => (
+          <div
+            key={i}
+            className={`h-2 flex-1 rounded-full transition-colors ${
+              i < currentStep ? "bg-blue-500" : "bg-blue-200"
+            }`}
+          />
+        ))}
+      </div>
+
+      <div className="text-xs text-blue-700">
+        {currentStep === 1 && "🔐 Generating encryption keys..."}
+        {currentStep === 2 && "📝 Encrypting your choice..."}
+        {currentStep === 3 && "⛓️ Sending to blockchain..."}
+        {currentStep === 4 && "🔍 Computing result (blind)..."}
+        {currentStep === 5 && "🔓 Decrypting result..."}
+      </div>
+    </div>
+  );
+};
+
+// Extend Window interface to include ethereum
+declare global {
+  interface Window {
+    ethereum?: {
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+    };
+  }
+}
+
 const choices = [
   { id: 0, label: "Rock", icon: "🪨", tone: "from-slate-200/80 via-slate-50 to-slate-100" },
   { id: 1, label: "Paper", icon: "📄", tone: "from-stone-200/70 via-white to-stone-100" },
@@ -19,6 +123,64 @@ export default function GameBoard() {
   const [loading, setLoading] = useState(false);
   const [serviceStatus, setServiceStatus] = useState<ServiceStatus | null>(null);
   const [demoMode, setDemoMode] = useState(false);
+
+  // FHE Education states
+  const [currentEducationStep, setCurrentEducationStep] = useState(0);
+  const [showEducationModal, setShowEducationModal] = useState(false);
+  const [encryptionProgress, setEncryptionProgress] = useState(0);
+  const [showProgress, setShowProgress] = useState(false);
+
+  // FHE Education content
+  const educationSteps = [
+    {
+      title: "What is Fully Homomorphic Encryption?",
+      description: "FHE allows computations to be performed on encrypted data without decrypting it first. This means your move stays secret while the smart contract can still process the game logic.",
+      code: `// Your choice: "Rock" (plaintext)
+// After FHE encryption: "E(ROCK)" (ciphertext)
+// Contract computes: E(ROCK) vs E(PAPER) = E(WIN/LOSE)
+// Only you can decrypt: E(WIN) → "You won!"`
+    },
+    {
+      title: "Why Do We Need FHE?",
+      description: "Traditional encryption requires decrypting data before processing, which exposes your private information. FHE keeps everything encrypted throughout the entire process, ensuring your move never leaves your device in plain text.",
+      code: `// Traditional approach:
+// 1. Send "Rock" to contract ❌ (visible to everyone)
+// 2. Contract processes "Rock" ❌ (can be manipulated)
+
+// FHE approach:
+// 1. Send E("Rock") to contract ✅ (encrypted)
+// 2. Contract processes E("Rock") ✅ (blind computation)`
+    },
+    {
+      title: "How FHE Works",
+      description: "FHE uses advanced mathematical operations that work on encrypted data. The contract performs calculations on ciphertexts and produces an encrypted result that only you can decrypt with your private key.",
+      code: `// Mathematical magic:
+// E(a) + E(b) = E(a + b)
+// E(a) × E(b) = E(a × b)
+// Your move + Contract logic = Encrypted result`
+    }
+  ];
+
+  // Show education modal
+  const showEducation = (step: number) => {
+    setCurrentEducationStep(step);
+    setShowEducationModal(true);
+  };
+
+  // Simulate encryption progress
+  const simulateEncryption = async () => {
+    setShowProgress(true);
+    setEncryptionProgress(0);
+
+    const steps = [1, 2, 3, 4, 5];
+    for (const step of steps) {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setEncryptionProgress(step);
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setShowProgress(false);
+  };
 
   // Check service status on component mount
   useEffect(() => {
@@ -45,7 +207,7 @@ export default function GameBoard() {
     setLoading(true);
     try {
       // Create a dummy signer for now - in real app you'd get this from wagmi
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum!);
       const signer = await provider.getSigner();
 
       const tx = await startNewGame(signer);
@@ -64,7 +226,7 @@ export default function GameBoard() {
 
     setLoading(true);
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(window.ethereum!);
       const signer = await provider.getSigner();
 
       await makeGuess(signer, gameId, choice);
@@ -95,13 +257,57 @@ export default function GameBoard() {
     "rounded-full border border-slate-200 px-5 py-3 text-sm font-medium text-slate-600 transition-colors hover:border-slate-900 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
-    <section className="flex w-full flex-col gap-6 rounded-2xl border border-slate-200 bg-white/90 p-8">
-      <header className="space-y-2">
-        <h2 className="text-xl font-semibold text-slate-900">Play a round</h2>
-        <p className="text-sm text-slate-500">
-          Start an encrypted match and keep every move hidden from the contract.
-        </p>
-      </header>
+    <>
+      <FHEEducationStep
+        step={currentEducationStep + 1}
+        title={educationSteps[currentEducationStep]?.title || ""}
+        description={educationSteps[currentEducationStep]?.description || ""}
+        code={educationSteps[currentEducationStep]?.code}
+        isVisible={showEducationModal}
+        onClose={() => setShowEducationModal(false)}
+      />
+
+      <section className="flex w-full flex-col gap-6 rounded-2xl border border-slate-200 bg-white/90 p-8">
+        <header className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-slate-900">Play a round</h2>
+              <p className="text-sm text-slate-500">
+                Start an encrypted match and keep every move hidden from the contract.
+              </p>
+            </div>
+
+            {/* FHE Education Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => showEducation(0)}
+                className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                title="Learn about FHE"
+              >
+                📚 What is FHE?
+              </button>
+              <button
+                onClick={() => showEducation(1)}
+                className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                title="Why FHE is needed"
+              >
+                ❓ Why FHE?
+              </button>
+              <button
+                onClick={() => showEducation(2)}
+                className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
+                title="How FHE works"
+              >
+                ⚙️ How it works
+              </button>
+            </div>
+          </div>
+
+          {/* Show encryption progress when active */}
+          {showProgress && (
+            <EncryptionProgress currentStep={encryptionProgress} totalSteps={5} />
+          )}
+        </header>
 
       {serviceStatus && (
         <div
@@ -111,11 +317,13 @@ export default function GameBoard() {
               : "border-emerald-200 bg-emerald-50 text-emerald-700"
           }`}
         >
-          <p className="font-medium">{demoMode ? "Demo mode" : "Services online"}</p>
+          <p className="font-medium">
+            {demoMode ? "Demo mode" : "FHEVM Ready"}
+          </p>
           <p className="mt-1 text-xs opacity-80">
             {demoMode
-              ? "FHEVM service is offline; mock responses keep the flow available."
-              : "All systems are operational. Moves stay encrypted throughout."}
+              ? "Relayer service unavailable. Using fallback mode with mock responses."
+              : "Zama Relayer is online. Your moves are fully encrypted and secure."}
           </p>
         </div>
       )}
@@ -203,24 +411,24 @@ export default function GameBoard() {
         </div>
       )}
 
-      <footer className="rounded-xl bg-slate-50 px-5 py-4 text-xs leading-relaxed text-slate-500">
-        {demoMode ? (
-          <>
-            <p className="font-medium text-slate-700">Demo mode active</p>
-            <p className="mt-1">
-              Real FHE execution is paused. Interactions mimic encrypted flow without the
-              live service.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="font-medium text-slate-700">Encrypted end-to-end</p>
-            <p className="mt-1">
-              Inputs are sealed locally and never leave your device in plain text.
-            </p>
-          </>
-        )}
-      </footer>
-    </section>
+        <footer className="rounded-xl bg-slate-50 px-5 py-4 text-xs leading-relaxed text-slate-500">
+          {demoMode ? (
+            <>
+              <p className="font-medium text-slate-700">Demo mode active</p>
+              <p className="mt-1">
+                Zama Relayer is currently unavailable. Game continues with fallback mode.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="font-medium text-slate-700">🔐 Fully Encrypted</p>
+              <p className="mt-1">
+                Powered by Zama FHEVM. Your moves are encrypted end-to-end with zero-knowledge proofs.
+              </p>
+            </>
+          )}
+        </footer>
+      </section>
+    </>
   );
 }

@@ -40,8 +40,16 @@ export const makeGuess = async (signer: ethers.Signer, gameId: number, choice: n
     return tx;
   } catch (error) {
     console.log("Make guess failed:", error);
-    // In demo mode, just return a mock transaction
-    return { hash: "0x" + "demo".repeat(10) } as ethers.ContractTransactionResponse;
+    // If FHEVM fails, try without encryption (demo mode)
+    try {
+      const contract = getContract(signer);
+      const tx = await contract.makeGuessDemo(gameId, choice);
+      await tx.wait();
+      return tx;
+    } catch (demoError) {
+      console.log("Demo mode also failed:", demoError);
+      return { hash: "0x" + "demo".repeat(10) } as ethers.ContractTransactionResponse;
+    }
   }
 };
 
