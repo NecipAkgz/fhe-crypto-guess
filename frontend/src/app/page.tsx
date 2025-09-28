@@ -52,24 +52,21 @@ export default function Home() {
     <main className="relative min-h-screen overflow-hidden text-slate-100">
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[480px] bg-gradient-to-b from-sky-500/20 via-emerald-500/10 to-transparent blur-3xl" />
 
-      <div className="relative mx-auto flex max-w-6xl flex-col gap-16 px-6 py-20 sm:px-8 lg:px-10">
-        <header className="flex flex-col items-center gap-3 text-center">
-          <span className="rounded-full border border-sky-400/30 bg-sky-400/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-sky-200">
-            Privacy-first demo
-          </span>
-          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+      <div className="relative mx-auto flex max-w-6xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
+        <header className="flex flex-col items-center gap-2 text-center">
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             FHE Guessing Game
           </h1>
-          <p className="max-w-2xl text-sm text-slate-300 sm:text-base">
-            Play Rock–Paper–Scissors while your move never leaves your device in plain text. Fully Homomorphic Encryption keeps the contract honest and blind.
+          <p className="max-w-xl text-sm text-slate-300">
+            Experience privacy-preserving gaming with Fully Homomorphic Encryption technology
           </p>
         </header>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 text-xs sm:text-[0.8rem]">
+        <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
           {highlights.map(({ icon, label, detail }) => (
             <span
               key={label}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-800/60 bg-slate-900/40 px-4 py-2 font-semibold uppercase tracking-[0.3em] text-slate-300 transition hover:border-sky-400/40 hover:text-sky-200"
+              className="inline-flex items-center gap-1 rounded-full border border-slate-800/60 bg-slate-900/40 px-3 py-1 font-semibold text-slate-300"
               title={detail}
             >
               <span aria-hidden="true">{icon}</span>
@@ -78,10 +75,10 @@ export default function Home() {
           ))}
         </div>
 
-        <section className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_360px] lg:items-start">
+        <section className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_360px] lg:items-start">
           <GameBoard ref={gameBoardRef} steps={steps} />
 
-          <aside className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 backdrop-blur-xl lg:sticky lg:top-24">
+          <aside className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-6 backdrop-blur-xl lg:sticky lg:top-24">
             <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">
               Quick onboarding
             </h2>

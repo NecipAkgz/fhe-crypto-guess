@@ -599,44 +599,24 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
         </div>
       )}
 
-      <section className="flex w-full flex-col gap-8 rounded-3xl border border-slate-800/60 bg-slate-950/70 p-10 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.9)] backdrop-blur-xl">
-        <header className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
-            <div className="space-y-3">
-              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-sky-500/40 bg-sky-500/10 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.45em] text-sky-200">
-                Match console
-              </span>
-              <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-                Run encrypted rounds in sync with the guide
-              </h2>
-              <p className="max-w-xl text-sm leading-relaxed text-slate-400">
-                Start a session, make a move, and watch the encryption progress bar track each step the sidebar explains. Everything stays private, yet the experience remains auditable.
-              </p>
-            </div>
-
-            <div className="flex w-full flex-col gap-5 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-5 text-left">
-              <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">
-                  How it works
-                </p>
-                <p className="text-sm text-slate-300">
-                  Follow each encrypted step while you run matches.
-                </p>
-              </div>
-
-              <ol className="space-y-4 text-sm text-slate-300">
-                {howItWorksSteps.map((step, index) => (
-                  <li key={step.title} className="flex gap-3">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-800/70 text-xs font-semibold text-slate-200">
+      <section className="flex w-full flex-col gap-4 rounded-2xl border border-slate-800/60 bg-slate-950/70 p-4 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.9)] backdrop-blur-xl">
+        <header className="space-y-3">
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
+              How it works
+            </h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {howItWorksSteps.map((step, index) => (
+                <div key={step.title} className="rounded-xl border border-slate-800/60 bg-slate-900/40 p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-slate-800/70 text-xs font-semibold text-slate-200">
                       {index + 1}
                     </span>
-                    <div className="space-y-1">
-                      <p className="font-medium text-slate-200">{step.title}</p>
-                      <p className="text-xs text-slate-400">{step.description}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
+                    <p className="text-sm font-medium text-slate-200">{step.title}</p>
+                  </div>
+                  <p className="text-xs text-slate-400 leading-relaxed">{step.description}</p>
+                </div>
+              ))}
             </div>
           </div>
 
