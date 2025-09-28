@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useWallet } from "@/hooks/useWallet";
 import { startNewGame, makeGuess, getGameResult, checkServices } from "@/lib/game";
 import { type ServiceStatus } from "@/lib/serviceStatus";
@@ -69,7 +69,22 @@ const choices = [
   { id: 2, label: "Scissors", icon: "✂️", tone: "from-rose-500/25 via-slate-950 to-slate-900" },
 ];
 
-export default function GameBoard() {
+export type HowItWorksStep = {
+  title: string;
+  description: string;
+};
+
+export type GameBoardHandle = {
+  startTutorial: () => void;
+  showEducation: (step: number) => void;
+  openEnvironmentModal: () => void;
+  openContractModal: () => void;
+  openFrontendModal: () => void;
+  openDeploymentModal: () => void;
+};
+
+const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
+  ({ steps: howItWorksSteps }, ref) => {
   const { address, isConnected, connectWallet } = useWallet();
   const [gameId, setGameId] = useState<number | null>(null);
   const [result, setResult] = useState<{won: boolean, choice: number} | null>(null);
@@ -276,15 +291,24 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    startTutorial,
+    showEducation,
+    openEnvironmentModal: () => setShowEnvironmentModal(true),
+    openContractModal: () => setShowContractModal(true),
+    openFrontendModal: () => setShowFrontendModal(true),
+    openDeploymentModal: () => setShowDeploymentModal(true),
+  }));
+
   // Simulate encryption progress
   const simulateEncryption = async () => {
     setShowProgress(true);
     setEncryptionProgress(0);
 
-    const steps = [1, 2, 3, 4, 5];
-    for (const step of steps) {
+    const progressStages = [1, 2, 3, 4, 5];
+    for (const stage of progressStages) {
       await new Promise(resolve => setTimeout(resolve, 800));
-      setEncryptionProgress(step);
+      setEncryptionProgress(stage);
     }
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -504,57 +528,26 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
             <div className="flex w-full flex-col gap-5 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-5 text-left">
               <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">
-                  Quick onboarding
+                  How it works
                 </p>
                 <p className="text-sm text-slate-300">
-                  Get oriented fast, then dive straight into encrypted play.
+                  Follow each encrypted step while you run matches.
                 </p>
               </div>
 
-              <div className="grid gap-2">
-                <button
-                  onClick={startTutorial}
-                  className="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:from-emerald-400 hover:to-teal-400"
-                >
-                  🚀 Launch interactive tutorial
-                </button>
-                <button
-                  onClick={() => showEducation(1)}
-                  className="rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-sky-400/50 hover:text-sky-200"
-                >
-                  📚 FHE essentials (3 steps)
-                </button>
-              </div>
-
-              <div className="flex flex-col gap-2 text-xs text-slate-300">
-                <p className="uppercase tracking-[0.35em] text-slate-500">Deep dive modules</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setShowEnvironmentModal(true)}
-                    className="rounded-lg border border-slate-700/70 px-3 py-2 font-semibold transition hover:border-sky-400/50 hover:text-sky-200"
-                  >
-                    Environment setup
-                  </button>
-                  <button
-                    onClick={() => setShowContractModal(true)}
-                    className="rounded-lg border border-slate-700/70 px-3 py-2 font-semibold transition hover:border-sky-400/50 hover:text-sky-200"
-                  >
-                    Smart contract
-                  </button>
-                  <button
-                    onClick={() => setShowFrontendModal(true)}
-                    className="rounded-lg border border-slate-700/70 px-3 py-2 font-semibold transition hover:border-sky-400/50 hover:text-sky-200"
-                  >
-                    Frontend integration
-                  </button>
-                  <button
-                    onClick={() => setShowDeploymentModal(true)}
-                    className="rounded-lg border border-slate-700/70 px-3 py-2 font-semibold transition hover:border-sky-400/50 hover:text-sky-200"
-                  >
-                    Deploy & test
-                  </button>
-                </div>
-              </div>
+              <ol className="space-y-4 text-sm text-slate-300">
+                {howItWorksSteps.map((step, index) => (
+                  <li key={step.title} className="flex gap-3">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-800/70 text-xs font-semibold text-slate-200">
+                      {index + 1}
+                    </span>
+                    <div className="space-y-1">
+                      <p className="font-medium text-slate-200">{step.title}</p>
+                      <p className="text-xs text-slate-400">{step.description}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
 
@@ -687,4 +680,9 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
       </section>
     </>
   );
-}
+  }
+);
+
+GameBoard.displayName = "GameBoard";
+
+export default GameBoard;
