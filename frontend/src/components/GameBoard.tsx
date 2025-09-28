@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
+import { useState, useEffect, useImperativeHandle, forwardRef, useCallback } from "react";
 import { useWallet } from "@/hooks/useWallet";
-import { startNewGame, makeGuess, getGameResult, checkServices } from "@/lib/game";
+import { startNewGame, makeGuess, getGameResult, checkServices, type StageCallback } from "@/lib/game";
 import { type ServiceStatus } from "@/lib/serviceStatus";
 import { ethers } from "ethers";
 import { FHEEducationModal } from './tutorial/FHEEducationModal';
@@ -10,46 +10,102 @@ import { EnvironmentSetupModal } from './tutorial/EnvironmentSetupModal';
 import { SmartContractModal } from './tutorial/SmartContractModal';
 import { FrontendIntegrationModal } from './tutorial/FrontendIntegrationModal';
 import { DeploymentTestingModal } from './tutorial/DeploymentTestingModal';
+import { FHE_PROGRESS_STAGES, type FheStage, type FheStageKey } from "@/lib/fheStages";
 
 
 
 // Encryption Progress Component
 const EncryptionProgress = ({
-  currentStep,
-  totalSteps
+  stages,
+  activeStageKey,
 }: {
-  currentStep: number;
-  totalSteps: number;
+  stages: FheStage[];
+  activeStageKey: FheStageKey | null;
 }) => {
+  const totalSteps = stages.length;
+  const activeIndex = activeStageKey
+    ? stages.findIndex((stage) => stage.key === activeStageKey)
+    : -1;
+  const activeStage = activeIndex >= 0 ? stages[activeIndex] : null;
+
   return (
-    <div className="mb-6 rounded-2xl border border-sky-400/40 bg-slate-950/40 p-4 backdrop-blur">
+    <div className="mb-4 rounded-2xl border border-sky-400/40 bg-slate-950/40 p-4 backdrop-blur">
       <div className="mb-4 flex items-center justify-between text-xs text-slate-300">
         <h4 className="text-sm font-semibold tracking-wide text-sky-200">
           Encryption progress
         </h4>
         <span>
-          Step {currentStep} of {totalSteps}
+          {activeIndex >= 0
+            ? `Step ${activeIndex + 1} of ${totalSteps}`
+            : `Ready for encrypted play`}
         </span>
       </div>
 
       <div className="mb-4 flex gap-2">
-        {Array.from({ length: totalSteps }, (_, i) => (
+        {stages.map((stage, index) => (
           <div
-            key={i}
+            key={stage.key}
             className={`h-2 flex-1 rounded-full transition-colors duration-500 ${
-              i < currentStep ? "bg-gradient-to-r from-sky-400 to-cyan-400" : "bg-slate-800"
+              index <= activeIndex
+                ? "bg-gradient-to-r from-sky-400 to-cyan-400"
+                : "bg-slate-800"
             }`}
           />
         ))}
       </div>
 
       <div className="text-[0.7rem] uppercase tracking-[0.3em] text-slate-400">
-        {currentStep === 1 && "🔐 Generating encryption keys"}
-        {currentStep === 2 && "📝 Encrypting your choice"}
-        {currentStep === 3 && "⛓️ Broadcasting ciphertext"}
-        {currentStep === 4 && "🔍 Computing result blindly"}
-        {currentStep === 5 && "🔓 Decrypting outcome locally"}
+        {activeStage
+          ? `${activeStage.icon} ${activeStage.label}`
+          : "Awaiting encrypted move"}
       </div>
+
+      {activeStage && (
+        <p className="pt-3 text-[0.65rem] leading-relaxed text-slate-400">
+          {activeStage.summary}
+        </p>
+      )}
+    </div>
+  );
+};
+
+const StageTimeline = ({
+  items,
+  showFallbackNotice,
+}: {
+  items: FheStage[];
+  showFallbackNotice: boolean;
+}) => {
+  if (items.length === 0 && !showFallbackNotice) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-3 rounded-2xl border border-slate-800/60 bg-slate-950/40 p-4">
+      <div className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+        FHE insights
+      </div>
+
+      <ul className="space-y-3 text-sm text-slate-200">
+        {items.map((stage) => (
+          <li key={stage.key} className="flex gap-3">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-base">
+              {stage.icon}
+            </span>
+            <div className="space-y-1">
+              <p className="font-semibold text-slate-100">{stage.label}</p>
+              <p className="text-xs text-slate-400">{stage.summary}</p>
+              <p className="text-xs text-sky-300">{stage.insight}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {showFallbackNotice && (
+        <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-200">
+          ⚠️ FHE services were unreachable, so the app returned a deterministic demo result. Try again once the relayer is back to experience full encryption.
+        </div>
+      )}
     </div>
   );
 };
@@ -96,8 +152,10 @@ const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
   const [currentEducationStep, setCurrentEducationStep] = useState(1);
   const [showEducationModal, setShowEducationModal] = useState(false);
   const [showTutorialWizard, setShowTutorialWizard] = useState(false);
-  const [encryptionProgress, setEncryptionProgress] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
+  const [activeStageKey, setActiveStageKey] = useState<FheStageKey | null>(null);
+  const [stageTimeline, setStageTimeline] = useState<FheStage[]>([]);
+  const [fallbackTriggered, setFallbackTriggered] = useState(false);
 
   // Tutorial modal states
   const [showEnvironmentModal, setShowEnvironmentModal] = useState(false);
@@ -300,20 +358,32 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     openDeploymentModal: () => setShowDeploymentModal(true),
   }));
 
-  // Simulate encryption progress
-  const simulateEncryption = async () => {
-    setShowProgress(true);
-    setEncryptionProgress(0);
+  const resetStageProgress = useCallback(() => {
+    setActiveStageKey(null);
+    setStageTimeline([]);
+    setFallbackTriggered(false);
+  }, []);
 
-    const progressStages = [1, 2, 3, 4, 5];
-    for (const stage of progressStages) {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setEncryptionProgress(stage);
+  const handleStageEvent: StageCallback = useCallback((stage: FheStage) => {
+    setStageTimeline((prev) => {
+      if (prev.some((item) => item.key === stage.key)) {
+        return prev;
+      }
+
+      const next = [...prev, stage];
+      return next.sort((a, b) => a.order - b.order);
+    });
+
+    if (stage.isProgress) {
+      setActiveStageKey(stage.key);
+      setShowProgress(true);
     }
 
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setShowProgress(false);
-  };
+    if (stage.key === "fallback-mode") {
+      setShowProgress(false);
+      setFallbackTriggered(true);
+    }
+  }, []);
 
   // Check service status on component mount
   useEffect(() => {
@@ -331,6 +401,18 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     checkStatus();
   }, []);
 
+  useEffect(() => {
+    if (activeStageKey === "decrypt-output") {
+      const timeout = setTimeout(() => {
+        setShowProgress(false);
+      }, 900);
+
+      return () => clearTimeout(timeout);
+    }
+
+    return undefined;
+  }, [activeStageKey]);
+
   const handleStartGame = async () => {
     if (!isConnected) {
       connectWallet();
@@ -346,6 +428,9 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
       await startNewGame(signer);
       // Game ID'yi transaction'dan al - simplified for demo
       setGameId(1);
+      resetStageProgress();
+      setShowProgress(false);
+      setResult(null);
     } catch (error) {
       console.error("Error starting game:", error);
       alert("Error starting game. Please try again.");
@@ -355,22 +440,26 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
   };
 
   const handleMakeGuess = async (choice: number) => {
-    if (!gameId) return;
+    if (!gameId || loading) {
+      return;
+    }
 
     setLoading(true);
-    void simulateEncryption();
+    resetStageProgress();
+    setShowProgress(true);
+
     try {
       const provider = new ethers.BrowserProvider(window.ethereum!);
       const signer = await provider.getSigner();
 
-      await makeGuess(signer, gameId, choice);
+      await makeGuess(signer, gameId, choice, handleStageEvent);
 
-      // Sonucu al
-      const gameResult = await getGameResult(signer, gameId);
+      const gameResult = await getGameResult(signer, gameId, handleStageEvent);
       setResult(gameResult);
     } catch (error) {
       console.error("Error making guess:", error);
       alert("Error making guess. Please try again.");
+      setShowProgress(false);
     } finally {
       setLoading(false);
     }
@@ -551,8 +640,19 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
             </div>
           </div>
 
-          {showProgress && (
-            <EncryptionProgress currentStep={encryptionProgress} totalSteps={5} />
+          {(showProgress || stageTimeline.length > 0 || fallbackTriggered) && (
+            <div className="space-y-4">
+              {showProgress && (
+                <EncryptionProgress
+                  stages={FHE_PROGRESS_STAGES}
+                  activeStageKey={activeStageKey}
+                />
+              )}
+              <StageTimeline
+                items={stageTimeline}
+                showFallbackNotice={fallbackTriggered}
+              />
+            </div>
           )}
         </header>
 
