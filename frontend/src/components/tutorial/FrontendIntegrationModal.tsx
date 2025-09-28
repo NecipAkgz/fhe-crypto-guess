@@ -100,26 +100,26 @@ export const FrontendIntegrationModal = ({
   const currentStep = frontendSteps[step - 1];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="mx-4 w-full max-w-4xl rounded-2xl bg-white p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur">
+      <div className="mx-4 w-full max-w-4xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_60px_140px_-60px_rgba(15,23,42,0.9)] max-h-[90vh] overflow-y-auto">
         <div className="mb-6 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-cyan-100 text-lg font-bold text-cyan-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-cyan-500/20 text-lg font-bold text-cyan-200">
             {step}
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-semibold text-slate-900">{currentStep?.title}</h3>
-            <p className="text-sm text-slate-500">Frontend Integration - Step {step} of {frontendSteps.length}</p>
+            <h3 className="text-xl font-semibold text-slate-100">{currentStep?.title}</h3>
+            <p className="text-sm text-slate-400">Frontend Integration - Step {step} of {frontendSteps.length}</p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-3 py-1 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded-full border border-slate-800/70 px-3 py-1 text-sm font-semibold text-slate-300 transition hover:border-slate-600/60 hover:text-slate-100"
           >
             Close
           </button>
         </div>
 
         <div className="mb-6 space-y-4">
-          <p className="text-slate-700 leading-relaxed">{currentStep?.description}</p>
+          <p className="leading-relaxed text-slate-300">{currentStep?.description}</p>
 
           {currentStep?.code && (
             <CodeBlock
@@ -130,9 +130,9 @@ export const FrontendIntegrationModal = ({
           )}
         </div>
 
-        <div className="mb-6 rounded-lg bg-cyan-50 p-4">
-          <h4 className="text-sm font-semibold text-cyan-900 mb-2">💡 Implementation Tip</h4>
-          <p className="text-sm text-cyan-800">
+        <div className="mb-6 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 p-5">
+          <h4 className="mb-2 text-sm font-semibold text-cyan-200">💡 Implementation Tip</h4>
+          <p className="text-sm text-cyan-100/90">
             {step === 1 && "Always store encryption keys securely in localStorage but never in plain text."}
             {step === 2 && "Implement automatic network switching to ensure users are on the correct chain."}
             {step === 3 && "Show encryption progress to users so they understand what's happening behind the scenes."}
@@ -145,7 +145,7 @@ export const FrontendIntegrationModal = ({
             {hasPrevious && (
               <button
                 onClick={onPrevious}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-full border border-slate-800/70 bg-slate-900/40 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-600/60 hover:text-slate-100"
               >
                 ← Previous
               </button>
@@ -156,10 +156,7 @@ export const FrontendIntegrationModal = ({
             <span>Step {step} of {frontendSteps.length}</span>
             <div className="flex gap-1">
               {frontendSteps.map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-2 w-2 rounded-full ${i + 1 === step ? 'bg-cyan-500' : 'bg-slate-300'}`}
-                />
+                <div key={i} className={`h-2 w-2 rounded-full ${i + 1 === step ? 'bg-cyan-400' : 'bg-slate-700'}`} />
               ))}
             </div>
           </div>
@@ -168,14 +165,14 @@ export const FrontendIntegrationModal = ({
             {hasNext ? (
               <button
                 onClick={onNext}
-                className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-700"
+                className="rounded-full bg-gradient-to-r from-cyan-500 to-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:from-cyan-400 hover:to-sky-400"
               >
                 Next →
               </button>
             ) : (
               <button
                 onClick={onClose}
-                className="rounded-lg bg-green-600 px-6 py-2 text-sm font-medium text-white hover:bg-green-700"
+                className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:from-emerald-400 hover:to-teal-400"
               >
                 Ready to Deploy! 🚀
               </button>

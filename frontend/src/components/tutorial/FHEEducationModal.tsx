@@ -71,26 +71,26 @@ export const FHEEducationModal = ({
   const currentStep = educationSteps[step - 1];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="mx-4 w-full max-w-3xl rounded-2xl bg-white p-8 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur">
+      <div className="mx-4 w-full max-w-3xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_60px_140px_-60px_rgba(15,23,42,0.9)]">
         <div className="mb-6 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-500/15 text-lg font-bold text-sky-200">
             {step}
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-semibold text-slate-900">{currentStep?.title}</h3>
-            <p className="text-sm text-slate-500">FHE Learning Module - Step {step} of 3</p>
+            <h3 className="text-xl font-semibold text-slate-100">{currentStep?.title}</h3>
+            <p className="text-sm text-slate-400">FHE Learning Module - Step {step} of 3</p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-3 py-1 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded-full border border-slate-800/70 px-3 py-1 text-sm font-semibold text-slate-300 transition hover:border-slate-600/60 hover:text-slate-100"
           >
             Skip Tutorial
           </button>
         </div>
 
         <div className="mb-6 space-y-4">
-          <p className="text-slate-700 leading-relaxed">{currentStep?.description}</p>
+          <p className="leading-relaxed text-slate-300">{currentStep?.description}</p>
 
           {currentStep?.code && (
             <CodeBlock
@@ -101,9 +101,9 @@ export const FHEEducationModal = ({
           )}
         </div>
 
-        <div className="mb-6 rounded-lg bg-blue-50 p-4">
-          <h4 className="text-sm font-semibold text-blue-900 mb-2">🎯 Key Takeaway</h4>
-          <p className="text-sm text-blue-800">
+        <div className="mb-6 rounded-2xl border border-sky-500/30 bg-sky-500/10 p-5">
+          <h4 className="mb-2 text-sm font-semibold text-sky-200">🎯 Key Takeaway</h4>
+          <p className="text-sm text-sky-100/90">
             {step === 1 && "FHE allows computations on encrypted data without decryption, enabling privacy-preserving smart contracts."}
             {step === 2 && "Traditional encryption requires decryption before processing, exposing sensitive data. FHE keeps everything encrypted."}
             {step === 3 && "FHE uses advanced mathematics to perform operations on ciphertexts, producing encrypted results."}
@@ -115,7 +115,7 @@ export const FHEEducationModal = ({
             {hasPrevious && (
               <button
                 onClick={onPrevious}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
+                className="rounded-full border border-slate-800/70 bg-slate-900/40 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-600/60 hover:text-slate-100"
               >
                 ← Previous
               </button>
@@ -138,14 +138,14 @@ export const FHEEducationModal = ({
             {hasNext ? (
               <button
                 onClick={onNext}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                className="rounded-full bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition hover:from-sky-400 hover:to-indigo-400"
               >
                 Next →
               </button>
             ) : (
               <button
                 onClick={onClose}
-                className="rounded-lg bg-green-600 px-6 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700"
+                className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:from-emerald-400 hover:to-teal-400"
               >
                 Start Building! 🚀
               </button>

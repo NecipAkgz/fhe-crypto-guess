@@ -22,31 +22,33 @@ const EncryptionProgress = ({
   totalSteps: number;
 }) => {
   return (
-    <div className="mb-6 rounded-xl bg-blue-50 p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h4 className="text-sm font-medium text-blue-900">Encryption Progress</h4>
-        <span className="text-xs text-blue-600">
+    <div className="mb-6 rounded-2xl border border-sky-400/40 bg-slate-950/40 p-4 backdrop-blur">
+      <div className="mb-4 flex items-center justify-between text-xs text-slate-300">
+        <h4 className="text-sm font-semibold tracking-wide text-sky-200">
+          Encryption progress
+        </h4>
+        <span>
           Step {currentStep} of {totalSteps}
         </span>
       </div>
 
-      <div className="mb-3 flex gap-2">
+      <div className="mb-4 flex gap-2">
         {Array.from({ length: totalSteps }, (_, i) => (
           <div
             key={i}
-            className={`h-2 flex-1 rounded-full transition-colors ${
-              i < currentStep ? "bg-blue-500" : "bg-blue-200"
+            className={`h-2 flex-1 rounded-full transition-colors duration-500 ${
+              i < currentStep ? "bg-gradient-to-r from-sky-400 to-cyan-400" : "bg-slate-800"
             }`}
           />
         ))}
       </div>
 
-      <div className="text-xs text-blue-700">
-        {currentStep === 1 && "🔐 Generating encryption keys..."}
-        {currentStep === 2 && "📝 Encrypting your choice..."}
-        {currentStep === 3 && "⛓️ Sending to blockchain..."}
-        {currentStep === 4 && "🔍 Computing result (blind)..."}
-        {currentStep === 5 && "🔓 Decrypting result..."}
+      <div className="text-[0.7rem] uppercase tracking-[0.3em] text-slate-400">
+        {currentStep === 1 && "🔐 Generating encryption keys"}
+        {currentStep === 2 && "📝 Encrypting your choice"}
+        {currentStep === 3 && "⛓️ Broadcasting ciphertext"}
+        {currentStep === 4 && "🔍 Computing result blindly"}
+        {currentStep === 5 && "🔓 Decrypting outcome locally"}
       </div>
     </div>
   );
@@ -62,9 +64,9 @@ declare global {
 }
 
 const choices = [
-  { id: 0, label: "Rock", icon: "🪨", tone: "from-slate-200/80 via-slate-50 to-slate-100" },
-  { id: 1, label: "Paper", icon: "📄", tone: "from-stone-200/70 via-white to-stone-100" },
-  { id: 2, label: "Scissors", icon: "✂️", tone: "from-zinc-200/80 via-white to-zinc-100" },
+  { id: 0, label: "Rock", icon: "🪨", tone: "from-slate-950 via-slate-900 to-slate-800" },
+  { id: 1, label: "Paper", icon: "📄", tone: "from-sky-500/20 via-slate-950 to-slate-900" },
+  { id: 2, label: "Scissors", icon: "✂️", tone: "from-rose-500/25 via-slate-950 to-slate-900" },
 ];
 
 export default function GameBoard() {
@@ -76,12 +78,11 @@ export default function GameBoard() {
   const [demoMode, setDemoMode] = useState(false);
 
   // Enhanced FHE Education states
-  const [currentEducationStep, setCurrentEducationStep] = useState(0);
+  const [currentEducationStep, setCurrentEducationStep] = useState(1);
   const [showEducationModal, setShowEducationModal] = useState(false);
   const [showTutorialWizard, setShowTutorialWizard] = useState(false);
   const [encryptionProgress, setEncryptionProgress] = useState(0);
   const [showProgress, setShowProgress] = useState(false);
-  const [tutorialCompleted, setTutorialCompleted] = useState(false);
 
   // Tutorial modal states
   const [showEnvironmentModal, setShowEnvironmentModal] = useState(false);
@@ -178,15 +179,11 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
 
   // Navigate education steps
   const nextEducationStep = () => {
-    if (currentEducationStep < educationSteps.length - 1) {
-      setCurrentEducationStep(currentEducationStep + 1);
-    }
+    setCurrentEducationStep((prev) => Math.min(prev + 1, educationSteps.length));
   };
 
   const previousEducationStep = () => {
-    if (currentEducationStep > 0) {
-      setCurrentEducationStep(currentEducationStep - 1);
-    }
+    setCurrentEducationStep((prev) => Math.max(prev - 1, 1));
   };
 
   // Start tutorial wizard
@@ -200,7 +197,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     switch (stepIndex) {
       case 0: // Start Tutorial
         setShowTutorialWizard(false);
-        showEducation(0);
+        showEducation(1);
         break;
       case 1: // Configure Environment
         setShowTutorialWizard(false);
@@ -322,7 +319,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
       const provider = new ethers.BrowserProvider(window.ethereum!);
       const signer = await provider.getSigner();
 
-      const tx = await startNewGame(signer);
+      await startNewGame(signer);
       // Game ID'yi transaction'dan al - simplified for demo
       setGameId(1);
     } catch (error) {
@@ -337,6 +334,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     if (!gameId) return;
 
     setLoading(true);
+    void simulateEncryption();
     try {
       const provider = new ethers.BrowserProvider(window.ethereum!);
       const signer = await provider.getSigner();
@@ -364,13 +362,23 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
   };
 
   const primaryButton =
-    "w-full rounded-full bg-slate-900 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400";
+    "w-full rounded-full bg-gradient-to-r from-sky-500 to-indigo-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition duration-200 hover:-translate-y-0.5 hover:from-sky-400 hover:to-indigo-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/50 disabled:cursor-not-allowed disabled:opacity-60";
   const subtleButton =
-    "rounded-full border border-slate-200 px-5 py-3 text-sm font-medium text-slate-600 transition-colors hover:border-slate-900 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50";
+    "rounded-full border border-slate-700/70 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:border-sky-400/50 hover:text-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40 disabled:cursor-not-allowed disabled:opacity-60";
 
   return (
     <>
 
+
+      <FHEEducationModal
+        step={currentEducationStep}
+        isVisible={showEducationModal}
+        onClose={() => setShowEducationModal(false)}
+        onNext={currentEducationStep < educationSteps.length ? nextEducationStep : undefined}
+        onPrevious={currentEducationStep > 1 ? previousEducationStep : undefined}
+        hasNext={currentEducationStep < educationSteps.length}
+        hasPrevious={currentEducationStep > 1}
+      />
 
       {/* Environment Setup Modal */}
       <EnvironmentSetupModal
@@ -418,29 +426,29 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
 
       {/* Tutorial Wizard Component */}
       {showTutorialWizard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="mx-4 w-full max-w-2xl rounded-2xl bg-white p-8 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur">
+          <div className="mx-4 w-full max-w-2xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_50px_140px_-60px_rgba(15,23,42,0.9)]">
             <div className="mb-6 text-center">
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">🚀 FHEVM Development Tutorial</h2>
-              <p className="text-slate-600">Your step-by-step guide to building privacy-preserving dApps</p>
+              <h2 className="mb-2 text-2xl font-semibold text-slate-100">🚀 FHEVM Development Tutorial</h2>
+              <p className="text-sm text-slate-400">Your step-by-step guide to building privacy-preserving dApps</p>
             </div>
 
             <div className="space-y-4 mb-8">
               {tutorialSteps.map((step, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-4 p-4 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                  className="flex items-center gap-4 rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4 transition hover:border-sky-400/50 hover:bg-slate-900/60"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-500/15 text-sm font-bold text-sky-200">
                     {index + 1}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900">{step.title}</h3>
-                    <p className="text-sm text-slate-600">{step.description}</p>
+                    <h3 className="font-semibold text-slate-100">{step.title}</h3>
+                    <p className="text-sm text-slate-400">{step.description}</p>
                   </div>
                   <button
                     onClick={() => handleTutorialStep(index)}
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                    className="rounded-full bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition hover:from-sky-400 hover:to-indigo-400"
                   >
                     {step.action}
                   </button>
@@ -451,7 +459,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
             <div className="flex justify-between items-center">
               <button
                 onClick={() => setShowTutorialWizard(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-full border border-slate-800/70 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-600/60 hover:text-slate-100"
               >
                 Maybe Later
               </button>
@@ -459,16 +467,16 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowTutorialWizard(false)}
-                  className="rounded-lg bg-slate-600 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+                  className="rounded-full border border-slate-700/70 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-slate-500"
                 >
                   Skip Tutorial
                 </button>
                 <button
                   onClick={() => {
                     setShowTutorialWizard(false);
-                    showEducation(0);
+                    showEducation(1);
                   }}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                  className="rounded-full bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition hover:from-sky-400 hover:to-indigo-400"
                 >
                   Start Learning! 📚
                 </button>
@@ -478,170 +486,200 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
         </div>
       )}
 
-      <section className="flex w-full flex-col gap-6 rounded-2xl border border-slate-200 bg-white/90 p-8">
-        <header className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <h2 className="text-xl font-semibold text-slate-900">Play a round</h2>
-              <p className="text-sm text-slate-500">
-                Start an encrypted match and keep every move hidden from the contract.
+      <section className="flex w-full flex-col gap-8 rounded-3xl border border-slate-800/60 bg-slate-950/70 p-10 shadow-[0_40px_90px_-60px_rgba(15,23,42,0.9)] backdrop-blur-xl">
+        <header className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start">
+            <div className="space-y-3">
+              <span className="inline-flex w-fit items-center gap-2 rounded-full border border-sky-500/40 bg-sky-500/10 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.45em] text-sky-200">
+                Match console
+              </span>
+              <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+                Run encrypted rounds in sync with the guide
+              </h2>
+              <p className="max-w-xl text-sm leading-relaxed text-slate-400">
+                Start a session, make a move, and watch the encryption progress bar track each step the sidebar explains. Everything stays private, yet the experience remains auditable.
               </p>
             </div>
 
-            {/* Enhanced FHE Education Buttons */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowTutorialWizard(true)}
-                className="rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 transition-colors hover:bg-green-100"
-                title="Complete tutorial wizard"
-              >
-                🚀 Full Tutorial
-              </button>
-              <button
-                onClick={() => showEducation(0)}
-                className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
-                title="Learn about FHE"
-              >
-                📚 What is FHE?
-              </button>
-              <button
-                onClick={() => showEducation(1)}
-                className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
-                title="Why FHE is needed"
-              >
-                ❓ Why FHE?
-              </button>
-              <button
-                onClick={() => showEducation(2)}
-                className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
-                title="How FHE works"
-              >
-                ⚙️ How it works
-              </button>
+            <div className="flex w-full flex-col gap-5 rounded-2xl border border-slate-800/70 bg-slate-900/50 p-5 text-left">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">
+                  Quick onboarding
+                </p>
+                <p className="text-sm text-slate-300">
+                  Get oriented fast, then dive straight into encrypted play.
+                </p>
+              </div>
+
+              <div className="grid gap-2">
+                <button
+                  onClick={startTutorial}
+                  className="rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:from-emerald-400 hover:to-teal-400"
+                >
+                  🚀 Launch interactive tutorial
+                </button>
+                <button
+                  onClick={() => showEducation(1)}
+                  className="rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-sky-400/50 hover:text-sky-200"
+                >
+                  📚 FHE essentials (3 steps)
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-2 text-xs text-slate-300">
+                <p className="uppercase tracking-[0.35em] text-slate-500">Deep dive modules</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setShowEnvironmentModal(true)}
+                    className="rounded-lg border border-slate-700/70 px-3 py-2 font-semibold transition hover:border-sky-400/50 hover:text-sky-200"
+                  >
+                    Environment setup
+                  </button>
+                  <button
+                    onClick={() => setShowContractModal(true)}
+                    className="rounded-lg border border-slate-700/70 px-3 py-2 font-semibold transition hover:border-sky-400/50 hover:text-sky-200"
+                  >
+                    Smart contract
+                  </button>
+                  <button
+                    onClick={() => setShowFrontendModal(true)}
+                    className="rounded-lg border border-slate-700/70 px-3 py-2 font-semibold transition hover:border-sky-400/50 hover:text-sky-200"
+                  >
+                    Frontend integration
+                  </button>
+                  <button
+                    onClick={() => setShowDeploymentModal(true)}
+                    className="rounded-lg border border-slate-700/70 px-3 py-2 font-semibold transition hover:border-sky-400/50 hover:text-sky-200"
+                  >
+                    Deploy & test
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Show encryption progress when active */}
           {showProgress && (
             <EncryptionProgress currentStep={encryptionProgress} totalSteps={5} />
           )}
         </header>
 
-      {serviceStatus && (
-        <div
-          className={`rounded-xl border px-4 py-3 text-sm ${
-            demoMode
-              ? "border-amber-200 bg-amber-50 text-amber-700"
-              : "border-emerald-200 bg-emerald-50 text-emerald-700"
-          }`}
-        >
-          <p className="font-medium">
-            {demoMode ? "Demo mode" : "FHEVM Ready"}
-          </p>
-          <p className="mt-1 text-xs opacity-80">
-            {demoMode
-              ? "Relayer service unavailable. Using fallback mode with mock responses."
-              : "Zama Relayer is online. Your moves are fully encrypted and secure."}
-          </p>
-        </div>
-      )}
-
-      {!isConnected ? (
-        <div className="flex flex-col gap-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center">
-          <p className="text-sm text-slate-600">Connect your wallet to begin.</p>
-          <button onClick={connectWallet} className={primaryButton}>
-            Connect Wallet
-          </button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-between rounded-xl bg-slate-50 px-5 py-3 text-xs text-slate-500">
-            <span>Connected</span>
-            <span className="font-medium text-slate-700">
-              {address?.slice(0, 6)}…{address?.slice(-4)}
-            </span>
+        {serviceStatus && (
+          <div
+            className={`rounded-2xl border px-5 py-4 text-sm backdrop-blur ${
+              demoMode
+                ? "border-amber-500/40 bg-amber-500/15 text-amber-100"
+                : "border-emerald-500/35 bg-emerald-500/15 text-emerald-100"
+            }`}
+          >
+            <p className="font-semibold uppercase tracking-[0.25em]">
+              {demoMode ? "Demo mode" : "FHEVM ready"}
+            </p>
+            <p className="mt-2 text-xs leading-relaxed opacity-80">
+              {demoMode
+                ? "Relayer service unavailable. Switching to deterministic mock flow so you can still explore the UX."
+                : "Zama Relayer is online. Every transaction flows through encrypted rails with verifiable proofs."}
+            </p>
           </div>
+        )}
 
-          {!gameId ? (
-            <button
-              onClick={handleStartGame}
-              disabled={loading}
-              className={primaryButton}
-            >
-              {loading ? "Starting…" : "Start New Game"}
+        {!isConnected ? (
+          <div className="flex flex-col gap-5 rounded-2xl border border-dashed border-slate-700/80 bg-slate-950/40 px-6 py-10 text-center">
+            <p className="text-sm text-slate-400">
+              Connect your wallet to begin.
+            </p>
+            <button onClick={connectWallet} className={primaryButton}>
+              Connect Wallet
             </button>
-          ) : (
-            <div className="flex flex-col gap-6">
-              <div className="space-y-3 text-center">
-                <h3 className="text-sm font-medium uppercase tracking-[0.3em] text-slate-500">
-                  Make your move
-                </h3>
-                <div className="flex flex-wrap justify-center gap-6">
-                  {choices.map((choice) => (
-                    <button
-                      key={choice.id}
-                      onClick={() => handleMakeGuess(choice.id)}
-                      disabled={loading}
-                      className="group flex flex-col items-center gap-3 text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 disabled:cursor-not-allowed disabled:opacity-60"
-                      aria-label={choice.label}
-                    >
-                      <span
-                        className={`flex h-36 w-24 flex-col items-center justify-center rounded-3xl border border-slate-200 bg-gradient-to-br ${choice.tone} text-4xl shadow-sm transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-lg group-focus-visible:-translate-y-1 group-focus-visible:shadow-lg`}
-                      >
-                        {choice.icon}
-                      </span>
-                      <span className="text-xs font-medium uppercase tracking-[0.3em] text-slate-400">
-                        {choice.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {result && (
-                <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-5 text-center">
-                  <p className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                    Result
-                  </p>
-                  <p
-                    className={`text-lg font-semibold ${
-                      result.won ? "text-emerald-600" : "text-rose-600"
-                    }`}
-                  >
-                    {result.won ? "You won" : "You lost"}
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    Computer chose: {getChoiceName(result.choice)}
-                  </p>
-                  <button
-                    onClick={() => {
-                      setGameId(null);
-                      setResult(null);
-                    }}
-                    className={subtleButton}
-                  >
-                    Play again
-                  </button>
-                </div>
-              )}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between rounded-2xl border border-slate-800/70 bg-slate-900/50 px-5 py-4 text-xs text-slate-400">
+              <span>Connected</span>
+              <span className="font-semibold text-slate-200">
+                {address?.slice(0, 6)}…{address?.slice(-4)}
+              </span>
             </div>
-          )}
-        </div>
-      )}
 
-        <footer className="rounded-xl bg-slate-50 px-5 py-4 text-xs leading-relaxed text-slate-500">
+            {!gameId ? (
+              <button
+                onClick={handleStartGame}
+                disabled={loading}
+                className={primaryButton}
+              >
+                {loading ? "Starting…" : "Start New Game"}
+              </button>
+            ) : (
+              <div className="flex flex-col gap-6">
+                <div className="space-y-4 text-center">
+                  <h3 className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">
+                    Make your move
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    {choices.map((choice) => (
+                      <button
+                        key={choice.id}
+                        onClick={() => handleMakeGuess(choice.id)}
+                        disabled={loading}
+                        className="group flex flex-col items-center gap-3 rounded-3xl border border-slate-800/70 bg-slate-900/50 p-4 text-slate-300 transition hover:border-sky-400/50 hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40 disabled:cursor-not-allowed disabled:opacity-60"
+                        aria-label={choice.label}
+                      >
+                        <span
+                          className={`flex h-32 w-28 items-center justify-center rounded-2xl border border-slate-800/80 bg-gradient-to-br ${choice.tone} text-4xl shadow-[0_25px_40px_-20px_rgba(14,21,40,0.9)] transition-transform duration-200 group-hover:-translate-y-1 group-hover:shadow-[0_35px_55px_-25px_rgba(56,189,248,0.45)]`}
+                        >
+                          {choice.icon}
+                        </span>
+                        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.4em] text-slate-400">
+                          {choice.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {result && (
+                  <div className="space-y-3 rounded-2xl border border-slate-800/70 bg-slate-900/60 px-6 py-6 text-center">
+                    <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-500">
+                      Result
+                    </p>
+                    <p
+                      className={`text-lg font-semibold ${
+                        result.won ? "text-emerald-300" : "text-rose-300"
+                      }`}
+                    >
+                      {result.won ? "You won" : "You lost"}
+                    </p>
+                    <p className="text-sm text-slate-400">
+                      Computer chose: {getChoiceName(result.choice)}
+                    </p>
+                    <button
+                      onClick={() => {
+                        setGameId(null);
+                        setResult(null);
+                      }}
+                      className={subtleButton}
+                    >
+                      Play again
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        <footer className="rounded-2xl border border-slate-800/70 bg-slate-900/60 px-6 py-5 text-xs leading-relaxed text-slate-400">
           {demoMode ? (
             <>
-              <p className="font-medium text-slate-700">Demo mode active</p>
+              <p className="font-semibold text-amber-200">Demo mode active</p>
               <p className="mt-1">
-                Zama Relayer is currently unavailable. Game continues with fallback mode.
+                Zama Relayer is currently unavailable. We are simulating encrypted responses for you to explore the flow.
               </p>
             </>
           ) : (
             <>
-              <p className="font-medium text-slate-700">🔐 Fully Encrypted</p>
+              <p className="font-semibold text-sky-200">🔐 Fully encrypted</p>
               <p className="mt-1">
-                Powered by Zama FHEVM. Your moves are encrypted end-to-end with zero-knowledge proofs.
+                Powered by Zama FHEVM. Your ciphertext never leaves the privacy boundary while consensus stays transparent.
               </p>
             </>
           )}

@@ -19,49 +19,85 @@ const steps = [
   },
 ];
 
+const highlights = [
+  {
+    icon: "🔒",
+    label: "Sealed inputs",
+    detail: "Client-side FHE keeps every move private until you decrypt.",
+  },
+  {
+    icon: "⚖️",
+    label: "Provable fairness",
+    detail: "Smart contracts compute blindly while remaining audit-friendly.",
+  },
+  {
+    icon: "⚙️",
+    label: "Dev ready",
+    detail: "Hardhat + FHEVM templates to ship privacy-preserving dApps fast.",
+  },
+  {
+    icon: "🧪",
+    label: "Encrypted UX",
+    detail: "Inspect game flow without leaking plaintext intent.",
+  },
+];
+
 export default function Home() {
   return (
-    <main className="min-h-screen bg-stone-100 text-slate-900">
-      <div className="mx-auto flex max-w-5xl flex-col gap-16 px-4 py-16 sm:px-6 lg:px-8">
+    <main className="relative min-h-screen overflow-hidden text-slate-100">
+      <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[480px] bg-gradient-to-b from-sky-500/20 via-emerald-500/10 to-transparent blur-3xl" />
+
+      <div className="relative mx-auto flex max-w-6xl flex-col gap-16 px-6 py-20 sm:px-8 lg:px-10">
         <header className="flex flex-col items-center gap-3 text-center">
-          <span className="rounded-full border border-slate-200 px-4 py-1 text-xs font-medium uppercase tracking-[0.2em] text-slate-500">
+          <span className="rounded-full border border-sky-400/30 bg-sky-400/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-sky-200">
             Privacy-first demo
           </span>
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
             FHE Guessing Game
           </h1>
-          <p className="max-w-2xl text-sm text-slate-500 sm:text-base">
-            Play Rock–Paper–Scissors while your move never leaves your device in plain
-            text. Fully Homomorphic Encryption keeps the contract honest and blind.
+          <p className="max-w-2xl text-sm text-slate-300 sm:text-base">
+            Play Rock–Paper–Scissors while your move never leaves your device in plain text. Fully Homomorphic Encryption keeps the contract honest and blind.
           </p>
         </header>
 
-        <section className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+        <div className="flex flex-wrap items-center justify-center gap-3 text-xs sm:text-[0.8rem]">
+          {highlights.map(({ icon, label, detail }) => (
+            <span
+              key={label}
+              className="inline-flex items-center gap-2 rounded-full border border-slate-800/60 bg-slate-900/40 px-4 py-2 font-semibold uppercase tracking-[0.3em] text-slate-300 transition hover:border-sky-400/40 hover:text-sky-200"
+              title={detail}
+            >
+              <span aria-hidden="true">{icon}</span>
+              <span>{label}</span>
+            </span>
+          ))}
+        </div>
+
+        <section className="grid gap-12 lg:grid-cols-[minmax(0,1.1fr)_360px] lg:items-start">
           <GameBoard />
 
-          <aside className="rounded-2xl border border-slate-200 bg-white/70 p-6 backdrop-blur lg:sticky lg:top-20">
-            <h2 className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+          <aside className="rounded-3xl border border-slate-800/60 bg-slate-900/60 p-8 backdrop-blur-xl lg:sticky lg:top-24">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-400">
               How it works
             </h2>
-            <ol className="mt-6 space-y-4">
+            <ol className="mt-8 space-y-4">
               {steps.map((step, index) => (
                 <li key={step.title} className="flex gap-4">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-xs font-medium text-slate-600">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800/70 text-xs font-semibold text-slate-200">
                     {index + 1}
                   </span>
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-slate-800">{step.title}</p>
-                    <p className="text-sm text-slate-500">{step.description}</p>
+                    <p className="text-sm font-medium text-slate-200">{step.title}</p>
+                    <p className="text-sm text-slate-400">{step.description}</p>
                   </div>
                 </li>
               ))}
             </ol>
 
-            <div className="mt-8 rounded-xl border-l-4 border-slate-900 bg-slate-900/5 px-5 py-4 text-sm text-slate-600">
-              <p className="font-medium text-slate-900">Encrypted from end to end</p>
-              <p className="mt-2 leading-relaxed">
-                Your move is sealed before submission. The contract operates on ciphertexts,
-                so only you can decrypt the outcome.
+            <div className="mt-8 rounded-2xl border border-slate-800/60 bg-slate-900/60 px-5 py-4 text-sm text-slate-300">
+              <p className="font-medium text-slate-100">Encrypted from end to end</p>
+              <p className="mt-2 leading-relaxed text-slate-400">
+                Your move is sealed before submission. The contract operates on ciphertexts, so only you can decrypt the outcome.
               </p>
             </div>
           </aside>

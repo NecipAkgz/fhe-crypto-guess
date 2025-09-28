@@ -98,26 +98,26 @@ export const SmartContractModal = ({
   const currentStep = contractSteps[step - 1];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="mx-4 w-full max-w-4xl rounded-2xl bg-white p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur">
+      <div className="mx-4 w-full max-w-4xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_60px_140px_-60px_rgba(15,23,42,0.9)] max-h-[90vh] overflow-y-auto">
         <div className="mb-6 flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-lg font-bold text-purple-600">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/20 text-lg font-bold text-purple-200">
             {step}
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-semibold text-slate-900">{currentStep?.title}</h3>
-            <p className="text-sm text-slate-500">Smart Contract Development - Step {step} of {contractSteps.length}</p>
+            <h3 className="text-xl font-semibold text-slate-100">{currentStep?.title}</h3>
+            <p className="text-sm text-slate-400">Smart Contract Development - Step {step} of {contractSteps.length}</p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg border border-slate-200 px-3 py-1 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded-full border border-slate-800/70 px-3 py-1 text-sm font-semibold text-slate-300 transition hover:border-slate-600/60 hover:text-slate-100"
           >
             Close
           </button>
         </div>
 
         <div className="mb-6 space-y-4">
-          <p className="text-slate-700 leading-relaxed">{currentStep?.description}</p>
+          <p className="leading-relaxed text-slate-300">{currentStep?.description}</p>
 
           {currentStep?.code && (
             <CodeBlock
@@ -128,9 +128,9 @@ export const SmartContractModal = ({
           )}
         </div>
 
-        <div className="mb-6 rounded-lg bg-purple-50 p-4">
-          <h4 className="text-sm font-semibold text-purple-900 mb-2">💡 Pro Tip</h4>
-          <p className="text-sm text-purple-800">
+        <div className="mb-6 rounded-2xl border border-purple-500/30 bg-purple-500/10 p-5">
+          <h4 className="mb-2 text-sm font-semibold text-purple-200">💡 Pro Tip</h4>
+          <p className="text-sm text-purple-100/90">
             {step === 1 && "Always use the smallest encrypted type possible (euint8 vs euint32) to save gas costs."}
             {step === 2 && "FHE operations cost 10-20x more gas than plaintext operations. Use them wisely!"}
             {step === 3 && "Set FHE permissions immediately after encryption to avoid access issues."}
@@ -143,7 +143,7 @@ export const SmartContractModal = ({
             {hasPrevious && (
               <button
                 onClick={onPrevious}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                className="rounded-full border border-slate-800/70 bg-slate-900/40 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:border-slate-600/60 hover:text-slate-100"
               >
                 ← Previous
               </button>
@@ -154,10 +154,7 @@ export const SmartContractModal = ({
             <span>Step {step} of {contractSteps.length}</span>
             <div className="flex gap-1">
               {contractSteps.map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-2 w-2 rounded-full ${i + 1 === step ? 'bg-purple-500' : 'bg-slate-300'}`}
-                />
+                <div key={i} className={`h-2 w-2 rounded-full ${i + 1 === step ? 'bg-purple-400' : 'bg-slate-700'}`} />
               ))}
             </div>
           </div>
@@ -166,14 +163,14 @@ export const SmartContractModal = ({
             {hasNext ? (
               <button
                 onClick={onNext}
-                className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+                className="rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition hover:from-purple-400 hover:to-indigo-400"
               >
                 Next →
               </button>
             ) : (
               <button
                 onClick={onClose}
-                className="rounded-lg bg-green-600 px-6 py-2 text-sm font-medium text-white hover:bg-green-700"
+                className="rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 transition hover:from-emerald-400 hover:to-teal-400"
               >
                 Ready to Code! 🚀
               </button>
