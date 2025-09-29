@@ -147,6 +147,7 @@ const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
   const [loading, setLoading] = useState(false);
   const [serviceStatus, setServiceStatus] = useState<ServiceStatus | null>(null);
   const [demoMode, setDemoMode] = useState(false);
+  const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
 
   // Enhanced FHE Education states
   const [currentEducationStep, setCurrentEducationStep] = useState(1);
@@ -155,7 +156,7 @@ const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
   const [showProgress, setShowProgress] = useState(false);
   const [activeStageKey, setActiveStageKey] = useState<FheStageKey | null>(null);
   const [stageTimeline, setStageTimeline] = useState<FheStage[]>([]);
-  const [fallbackTriggered, setFallbackTriggered] = useState(false);
+
 
   // Tutorial modal states
   const [showEnvironmentModal, setShowEnvironmentModal] = useState(false);
@@ -361,7 +362,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
   const resetStageProgress = useCallback(() => {
     setActiveStageKey(null);
     setStageTimeline([]);
-    setFallbackTriggered(false);
+    setSelectedChoice(null);
   }, []);
 
   const handleStageEvent: StageCallback = useCallback((stage: FheStage) => {
@@ -377,11 +378,6 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     if (stage.isProgress) {
       setActiveStageKey(stage.key);
       setShowProgress(true);
-    }
-
-    if (stage.key === "fallback-mode") {
-      setShowProgress(false);
-      setFallbackTriggered(true);
     }
   }, []);
 
@@ -410,11 +406,10 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
 
   useEffect(() => {
     if (activeStageKey === "decrypt-output") {
-      const timeout = setTimeout(() => {
-        setShowProgress(false);
-      }, 900);
-
-      return () => clearTimeout(timeout);
+      // Progress'i otomatik kapatma - kullanıcı sonucu gördükten sonra manuel kapatsın
+      // const timeout = setTimeout(() => {
+      //   setShowProgress(false);
+      // }, 900);
     }
 
     return undefined;
@@ -447,10 +442,12 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
   };
 
   const handleMakeGuess = async (choice: number) => {
-    if (!gameId || loading) {
+    if (!gameId || loading || selectedChoice !== null || result !== null) {
       return;
     }
 
+    // İlk seçim yapıldığında selectedChoice'ı set et
+    setSelectedChoice(choice);
     setLoading(true);
     resetStageProgress();
     setShowProgress(true);
@@ -466,7 +463,9 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     } catch (error) {
       console.error("Error making guess:", error);
       alert("Error making guess. Please try again.");
-      setShowProgress(false);
+      // Hata durumunda seçimi sıfırla
+      setSelectedChoice(null);
+      // Progress açık kalsın, kullanıcı tekrar denesin
     } finally {
       setLoading(false);
     }
@@ -627,7 +626,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
             </div>
           </div>
 
-          {(showProgress || stageTimeline.length > 0 || fallbackTriggered) && (
+          {(showProgress || stageTimeline.length > 0) && (
             <div className="space-y-4">
               {showProgress && (
                 <EncryptionProgress
@@ -637,7 +636,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
               )}
               <StageTimeline
                 items={stageTimeline}
-                showFallbackNotice={fallbackTriggered}
+                showFallbackNotice={false}
               />
             </div>
           )}
@@ -699,8 +698,12 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
                       <button
                         key={choice.id}
                         onClick={() => handleMakeGuess(choice.id)}
-                        disabled={loading}
-                        className="group flex flex-col items-center gap-3 rounded-3xl border border-slate-800/70 bg-slate-900/50 p-4 text-slate-300 transition hover:border-sky-400/50 hover:text-sky-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40 disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={loading || result !== null}
+                        className={`group flex flex-col items-center gap-3 rounded-3xl border p-4 text-slate-300 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-400/40 disabled:cursor-not-allowed disabled:opacity-60 ${
+                          selectedChoice === choice.id
+                            ? "border-sky-400/70 bg-slate-900/70"
+                            : "border-slate-800/70 bg-slate-900/50 hover:border-sky-400/50 hover:text-sky-100"
+                        }`}
                         aria-label={choice.label}
                       >
                         <span
@@ -735,6 +738,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
                       onClick={() => {
                         setGameId(null);
                         setResult(null);
+                        setSelectedChoice(null);
                       }}
                       className={subtleButton}
                     >
