@@ -20,7 +20,7 @@ interface FHEEducationModalProps {
 
 const moveLabels = ["Rock", "Paper", "Scissors"];
 
-const computerMove = 1; // Paper
+const computerMove: number = 1; // Paper
 
 const computeCipherPreview = (move: number) => {
   const pseudo = (move * 73 + 63) % 256;
@@ -116,8 +116,14 @@ export const FHEEducationModal = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur">
-      <div className="mx-4 w-full max-w-5xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_60px_140px_-60px_rgba(15,23,42,0.9)]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur"
+      onClick={onClose}
+    >
+      <div
+        className="mx-4 w-full max-w-5xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_60px_140px_-60px_rgba(15,23,42,0.9)]"
+        onClick={(e) => e.stopPropagation()}
+      >
         <header className="mb-6 flex flex-wrap items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-500/15 text-lg font-bold text-sky-200">
             {safeIndex + 1}
@@ -179,7 +185,7 @@ export const FHEEducationModal = ({
             {currentStep.codeSnippet && (
               <CodeBlock
                 code={currentStep.codeSnippet.code}
-                language={currentStep.codeSnippet.language}
+                language={currentStep.codeSnippet.language as 'solidity' | 'typescript' | 'bash' | 'javascript'}
                 title={currentStep.codeSnippet.title}
               />
             )}

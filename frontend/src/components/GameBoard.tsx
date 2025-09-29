@@ -590,8 +590,14 @@ const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
 
       {/* Tutorial Wizard Component */}
       {showTutorialWizard && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur">
-          <div className="mx-4 w-full max-w-2xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_50px_140px_-60px_rgba(15,23,42,0.9)]">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur"
+          onClick={() => setShowTutorialWizard(false)}
+        >
+          <div
+            className="mx-4 w-full max-w-2xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_50px_140px_-60px_rgba(15,23,42,0.9)]"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="mb-6 text-center">
               <h2 className="mb-2 text-2xl font-semibold text-slate-100">🚀 FHEVM Development Tutorial</h2>
               <p className="text-sm text-slate-400">Your step-by-step guide to building privacy-preserving dApps</p>

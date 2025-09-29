@@ -28,8 +28,14 @@ export const GlossaryModal = ({ isVisible, onClose, entries }: GlossaryModalProp
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur">
-      <div className="mx-4 w-full max-w-3xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_60px_140px_-60px_rgba(15,23,42,0.9)]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur"
+      onClick={onClose}
+    >
+      <div
+        className="mx-4 w-full max-w-3xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_60px_140px_-60px_rgba(15,23,42,0.9)]"
+        onClick={(e) => e.stopPropagation()}
+      >
         <header className="mb-6 flex items-center justify-between">
           <div>
             <h3 className="text-xl font-semibold text-slate-100">FHE Glossary</h3>
