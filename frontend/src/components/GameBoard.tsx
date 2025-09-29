@@ -401,6 +401,13 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     checkStatus();
   }, []);
 
+  // Hydration fix: Ensure consistent rendering between server and client
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     if (activeStageKey === "decrypt-output") {
       const timeout = setTimeout(() => {
@@ -636,7 +643,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
           )}
         </header>
 
-        {serviceStatus && (
+        {isClient && serviceStatus && (
           <div
             className={`rounded-2xl border px-5 py-4 text-sm backdrop-blur ${
               demoMode
@@ -741,7 +748,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
         )}
 
         <footer className="rounded-2xl border border-slate-800/70 bg-slate-900/60 px-6 py-5 text-xs leading-relaxed text-slate-400">
-          {demoMode ? (
+          {isClient && demoMode ? (
             <>
               <p className="font-semibold text-amber-200">Demo mode active</p>
               <p className="mt-1">
@@ -749,12 +756,14 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
               </p>
             </>
           ) : (
-            <>
-              <p className="font-semibold text-sky-200">🔐 Fully encrypted</p>
-              <p className="mt-1">
-                Powered by Zama FHEVM. Your ciphertext never leaves the privacy boundary while consensus stays transparent.
-              </p>
-            </>
+            isClient && (
+              <>
+                <p className="font-semibold text-sky-200">🔐 Fully encrypted</p>
+                <p className="mt-1">
+                  Powered by Zama FHEVM. Your ciphertext never leaves the privacy boundary while consensus stays transparent.
+                </p>
+              </>
+            )
           )}
         </footer>
       </section>
