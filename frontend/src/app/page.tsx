@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import GameBoard, { type GameBoardHandle } from "@/components/GameBoard";
+import { FHE_EDUCATION_STEPS } from "@/lib/fheEducation";
 
 const steps = [
   {
@@ -97,7 +98,13 @@ export default function Home() {
                 onClick={() => gameBoardRef.current?.showEducation(1)}
                 className="rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-2 font-semibold text-slate-200 transition hover:border-sky-400/50 hover:text-sky-200"
               >
-                📚 FHE essentials (3 steps)
+                📚 FHE essentials ({FHE_EDUCATION_STEPS.length} steps)
+              </button>
+              <button
+                onClick={() => gameBoardRef.current?.openGlossaryModal()}
+                className="rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-2 font-semibold text-slate-200 transition hover:border-emerald-400/50 hover:text-emerald-200"
+              >
+                🧠 Glossary
               </button>
             </div>
 

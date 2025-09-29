@@ -10,7 +10,9 @@ import { EnvironmentSetupModal } from './tutorial/EnvironmentSetupModal';
 import { SmartContractModal } from './tutorial/SmartContractModal';
 import { FrontendIntegrationModal } from './tutorial/FrontendIntegrationModal';
 import { DeploymentTestingModal } from './tutorial/DeploymentTestingModal';
-import { FHE_PROGRESS_STAGES, type FheStage, type FheStageKey } from "@/lib/fheStages";
+import { GlossaryModal } from './tutorial/GlossaryModal';
+import { FHE_PROGRESS_STAGES, getStageByKey, type FheStage, type FheStageKey } from "@/lib/fheStages";
+import { FHE_EDUCATION_STEPS, FHE_GLOSSARY } from "@/lib/fheEducation";
 
 
 
@@ -137,6 +139,7 @@ export type GameBoardHandle = {
   openContractModal: () => void;
   openFrontendModal: () => void;
   openDeploymentModal: () => void;
+  openGlossaryModal: () => void;
 };
 
 const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
@@ -156,6 +159,8 @@ const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
   const [showProgress, setShowProgress] = useState(false);
   const [activeStageKey, setActiveStageKey] = useState<FheStageKey | null>(null);
   const [stageTimeline, setStageTimeline] = useState<FheStage[]>([]);
+  const [educationPreviewStage, setEducationPreviewStage] = useState<FheStage | null>(null);
+  const [isEducationPreview, setIsEducationPreview] = useState(false);
 
 
   // Tutorial modal states
@@ -163,58 +168,11 @@ const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
   const [showContractModal, setShowContractModal] = useState(false);
   const [showFrontendModal, setShowFrontendModal] = useState(false);
   const [showDeploymentModal, setShowDeploymentModal] = useState(false);
+  const [showGlossaryModal, setShowGlossaryModal] = useState(false);
   const [currentEnvStep, setCurrentEnvStep] = useState(1);
   const [currentContractStep, setCurrentContractStep] = useState(1);
   const [currentFrontendStep, setCurrentFrontendStep] = useState(1);
   const [currentDeploymentStep, setCurrentDeploymentStep] = useState(1);
-
-  // Enhanced FHE Education content with more depth
-  const educationSteps = [
-    {
-      title: "🔐 What is Fully Homomorphic Encryption?",
-      description: "Fully Homomorphic Encryption (FHE) is a revolutionary cryptographic technique that allows computations to be performed directly on encrypted data. In traditional systems, you need to decrypt data before processing it, exposing sensitive information. FHE eliminates this vulnerability by enabling 'blind computation' - your private data stays encrypted throughout the entire process.",
-      code: `// Traditional Blockchain (INSECURE):
-// function makeMove(uint8 move) public {
-//     playerMove = move;  // ❌ Visible to everyone!
-//     result = computeResult(move, computerMove);
-// }
-
-// FHEVM Approach (SECURE):
-// function makeMove(euint8 encryptedMove) public {
-//     euint8 result = computeFHE(encryptedMove, computerChoice);
-//     // ✅ Everything stays encrypted!
-// }`
-    },
-    {
-      title: "🛡️ Why Do We Need FHE?",
-      description: "Blockchain's transparency is both a strength and a weakness. While it ensures trust through visibility, it also means sensitive data like your game moves, voting choices, or financial information becomes public. FHE solves this privacy paradox by enabling confidential smart contracts where the computation logic remains transparent while user data stays completely private.",
-      code: `// PRIVACY COMPARISON:
-
-// Without FHE:
-playerMove = 0;        // 🟡 Visible on-chain
-computerMove = 1;      // 🟡 Visible on-chain
-result = "You Lost";   // 🟡 Visible on-chain
-
-// With FHE:
-E(playerMove) = "E(0)";     // 🟢 Encrypted
-E(computerMove) = "E(1)";   // 🟢 Encrypted
-E(result) = "E(false)";     // 🟢 Only you can decrypt!`
-    },
-    {
-      title: "⚡ How FHE Magic Works",
-      description: "FHE uses advanced mathematical operations (homomorphic means 'same structure') that preserve the ability to perform calculations on ciphertexts. When you encrypt your move, the smart contract can compare it with the computer's encrypted choice and produce an encrypted result - all without ever seeing the plaintext values. Only you hold the decryption key to reveal the final outcome.",
-      code: `// FHE Mathematical Operations:
-// E(a) + E(b) = E(a + b)  ✅ Addition works!
-// E(a) × E(b) = E(a × b)  ✅ Multiplication works!
-// E(a) == E(b) = E(a == b) ✅ Comparison works!
-
-// Your game flow:
-// 1. You encrypt: "Rock" → E(0)
-// 2. Contract computes: E(0) vs E(1) = E(false)
-// 3. You decrypt: E(false) → "You lost!"
-// 4. No one else learns your move! 🎉`
-    }
-  ];
 
   // Tutorial wizard for first-time users
   const tutorialSteps = [
@@ -245,25 +203,92 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     }
   ];
 
+  const applyEducationPreview = useCallback((stepNumber: number) => {
+    const stepData = FHE_EDUCATION_STEPS[stepNumber - 1];
+
+    if (!stepData) {
+      setEducationPreviewStage(null);
+      setIsEducationPreview(false);
+      return;
+    }
+
+    if (stepData.stageKey) {
+      const stage = getStageByKey(stepData.stageKey);
+      setEducationPreviewStage(stage);
+      setActiveStageKey(stage.key);
+      setShowProgress(true);
+    } else {
+      setEducationPreviewStage(null);
+      if (stageTimeline.length > 0) {
+        const lastStage = stageTimeline[stageTimeline.length - 1];
+        if (lastStage.isProgress) {
+          setActiveStageKey(lastStage.key);
+        }
+        setShowProgress(true);
+      } else {
+        setActiveStageKey(null);
+        setShowProgress(false);
+      }
+    }
+
+    setIsEducationPreview(true);
+  }, [stageTimeline]);
+
+  const clearEducationPreview = useCallback(() => {
+    setIsEducationPreview(false);
+    setEducationPreviewStage(null);
+
+    if (stageTimeline.length > 0) {
+      const lastStage = stageTimeline[stageTimeline.length - 1];
+      if (lastStage.isProgress) {
+        setActiveStageKey(lastStage.key);
+        setShowProgress(true);
+      }
+    } else {
+      setActiveStageKey(null);
+      setShowProgress(false);
+    }
+  }, [stageTimeline]);
+
   // Show education modal with navigation
+  const handleCloseEducationModal = useCallback(() => {
+    setShowEducationModal(false);
+    clearEducationPreview();
+  }, [clearEducationPreview]);
+
+  const closeGlossaryModal = useCallback(() => {
+    setShowGlossaryModal(false);
+  }, []);
+
   const showEducation = (step: number) => {
-    setCurrentEducationStep(step);
+    const safeStep = Math.min(Math.max(step, 1), FHE_EDUCATION_STEPS.length);
+    setCurrentEducationStep(safeStep);
     setShowEducationModal(true);
+    applyEducationPreview(safeStep);
   };
 
   // Navigate education steps
   const nextEducationStep = () => {
-    setCurrentEducationStep((prev) => Math.min(prev + 1, educationSteps.length));
+    setCurrentEducationStep((prev) => {
+      const nextStep = Math.min(prev + 1, FHE_EDUCATION_STEPS.length);
+      applyEducationPreview(nextStep);
+      return nextStep;
+    });
   };
 
   const previousEducationStep = () => {
-    setCurrentEducationStep((prev) => Math.max(prev - 1, 1));
+    setCurrentEducationStep((prev) => {
+      const nextStep = Math.max(prev - 1, 1);
+      applyEducationPreview(nextStep);
+      return nextStep;
+    });
   };
 
   // Start tutorial wizard
   const startTutorial = () => {
     setShowTutorialWizard(true);
     setShowEducationModal(false);
+    clearEducationPreview();
   };
 
   // Handle tutorial step actions
@@ -357,15 +382,22 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     openContractModal: () => setShowContractModal(true),
     openFrontendModal: () => setShowFrontendModal(true),
     openDeploymentModal: () => setShowDeploymentModal(true),
+    openGlossaryModal: () => setShowGlossaryModal(true),
   }));
 
   const resetStageProgress = useCallback(() => {
     setActiveStageKey(null);
     setStageTimeline([]);
+    setEducationPreviewStage(null);
+    setIsEducationPreview(false);
+    setShowProgress(false);
     setSelectedChoice(null);
   }, []);
 
   const handleStageEvent: StageCallback = useCallback((stage: FheStage) => {
+    setEducationPreviewStage(null);
+    setIsEducationPreview(false);
+
     setStageTimeline((prev) => {
       if (prev.some((item) => item.key === stage.key)) {
         return prev;
@@ -405,15 +437,19 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
   }, []);
 
   useEffect(() => {
+    if (isEducationPreview) {
+      return undefined;
+    }
+
     if (activeStageKey === "decrypt-output") {
-      // Progress'i otomatik kapatma - kullanıcı sonucu gördükten sonra manuel kapatsın
+      // Keep the progress indicator on screen; let players dismiss it after reviewing the result
       // const timeout = setTimeout(() => {
       //   setShowProgress(false);
       // }, 900);
     }
 
     return undefined;
-  }, [activeStageKey]);
+  }, [activeStageKey, isEducationPreview]);
 
   const handleStartGame = async () => {
     if (!isConnected) {
@@ -428,7 +464,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
       const signer = await provider.getSigner();
 
       await startNewGame(signer);
-      // Game ID'yi transaction'dan al - simplified for demo
+      // Hard-coded demo value; normally derive from the transaction receipt
       setGameId(1);
       resetStageProgress();
       setShowProgress(false);
@@ -446,7 +482,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
       return;
     }
 
-    // İlk seçim yapıldığında selectedChoice'ı set et
+    // Capture the first choice so repeat clicks are ignored while processing
     setSelectedChoice(choice);
     setLoading(true);
     resetStageProgress();
@@ -463,9 +499,9 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
     } catch (error) {
       console.error("Error making guess:", error);
       alert("Error making guess. Please try again.");
-      // Hata durumunda seçimi sıfırla
+      // Allow another attempt by clearing the selection
       setSelectedChoice(null);
-      // Progress açık kalsın, kullanıcı tekrar denesin
+      setShowProgress(false);
     } finally {
       setLoading(false);
     }
@@ -491,12 +527,21 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
 
       <FHEEducationModal
         step={currentEducationStep}
+        steps={FHE_EDUCATION_STEPS}
         isVisible={showEducationModal}
-        onClose={() => setShowEducationModal(false)}
-        onNext={currentEducationStep < educationSteps.length ? nextEducationStep : undefined}
+        onClose={handleCloseEducationModal}
+        onNext={currentEducationStep < FHE_EDUCATION_STEPS.length ? nextEducationStep : undefined}
         onPrevious={currentEducationStep > 1 ? previousEducationStep : undefined}
-        hasNext={currentEducationStep < educationSteps.length}
+        hasNext={currentEducationStep < FHE_EDUCATION_STEPS.length}
         hasPrevious={currentEducationStep > 1}
+        onSelectStep={showEducation}
+        onOpenGlossary={() => setShowGlossaryModal(true)}
+      />
+
+      <GlossaryModal
+        isVisible={showGlossaryModal}
+        onClose={closeGlossaryModal}
+        entries={FHE_GLOSSARY}
       />
 
       {/* Environment Setup Modal */}
@@ -635,7 +680,7 @@ E(result) = "E(false)";     // 🟢 Only you can decrypt!`
                 />
               )}
               <StageTimeline
-                items={stageTimeline}
+                items={educationPreviewStage ? [educationPreviewStage] : stageTimeline}
                 showFallbackNotice={false}
               />
             </div>

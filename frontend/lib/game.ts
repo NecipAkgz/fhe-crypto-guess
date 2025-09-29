@@ -30,21 +30,21 @@ export const makeGuess = async (
   choice: number,
   onStage?: StageCallback
 ) => {
-  // Kullanıcı gerçek FHE istediği için direkt demo modunu kullan
+  // Simulate the FHE workflow with the demo-oriented contract helper
   try {
-    // Adım 1: Hazırlık aşaması
+    // Step 1: Client preparation
     onStage?.(getStageByKey("prepare-client"));
     await new Promise(resolve => setTimeout(resolve, 1200));
 
-    // Adım 2: Şifreleme aşaması
+    // Step 2: Encrypt the input
     onStage?.(getStageByKey("encrypt-input"));
     await new Promise(resolve => setTimeout(resolve, 1200));
 
-    // Demo kontrat çağrısı
+    // Execute the demo contract call
     const contract = getContract(signer);
     const tx = await contract.makeGuessDemo(gameId, choice);
 
-    // Adım 3: Gönderim aşaması
+    // Step 3: Submit ciphertext
     onStage?.(getStageByKey("submit-ciphertext"));
     await new Promise(resolve => setTimeout(resolve, 800));
 
@@ -52,7 +52,7 @@ export const makeGuess = async (
     return tx;
   } catch (error) {
     console.log("Demo guess failed:", error);
-    // Basit mock response döndür
+    // Return a simple mock response so the flow can continue
     return { hash: "0x" + "demo".repeat(10) } as ethers.ContractTransactionResponse;
   }
 };
@@ -62,11 +62,11 @@ export const getGameResult = async (
   gameId: number,
   onStage?: StageCallback
 ) => {
-  // Adım 4: Kör hesaplama aşaması
+  // Step 4: Blind computation
   onStage?.(getStageByKey("blind-computation"));
   await new Promise(resolve => setTimeout(resolve, 1500));
 
-  // Adım 5: Şifre çözme aşaması
+  // Step 5: Decrypt the output
   onStage?.(getStageByKey("decrypt-output"));
   await new Promise(resolve => setTimeout(resolve, 1000));
 
