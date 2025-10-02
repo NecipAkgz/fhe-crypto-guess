@@ -397,4 +397,18 @@ contract FHEGuessingGame is SepoliaConfig {
          */
         return (game.player, game.state, game.createdAt);
     }
+
+    /**
+     * @notice Get the next available game ID
+     * @dev Public getter for the nextGameId counter
+     * @return The next game ID that will be assigned
+     *
+     * USE CASE:
+     * - Enables tests and frontend to predict game IDs
+     * - Useful for testing and debugging
+     * - No security risk as it's just a counter
+     */
+    function getNextGameId() external view returns (uint256) {
+        return nextGameId;
+    }
 }
