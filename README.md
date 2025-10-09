@@ -1,5 +1,7 @@
 # 🔐 FHEVM Guessing Game Tutorial
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-View%20Application-FFD20A?style=for-the-badge&logo=vercel)](https://fhe-guessing.vercel.app/)
+
 A comprehensive, beginner-friendly tutorial for building Fully Homomorphic Encryption (FHE) enabled dApps on the Zama Protocol. This project demonstrates how to create a privacy-preserving Rock-Paper-Scissors game where players' moves remain encrypted throughout the entire process.
 
 ## 🎯 Learning Objectives
@@ -98,7 +100,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) to see your dApp!
 
-## 📚 Detailed Tutorial Sections
+##  Detailed Tutorial Sections
 
 ### Section 1: Understanding FHE Fundamentals
 - [FHE Mathematical Concepts](./docs/fhe-fundamentals.md)
