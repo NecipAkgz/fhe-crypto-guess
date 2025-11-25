@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface SecurityModalProps {
   isVisible: boolean;
@@ -7,6 +8,7 @@ interface SecurityModalProps {
 }
 
 export const SecurityModal = ({ isVisible, onClose }: SecurityModalProps) => {
+  useLockBodyScroll(isVisible);
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<"replay" | "network">("replay");
   const [replayStep, setReplayStep] = useState(0);

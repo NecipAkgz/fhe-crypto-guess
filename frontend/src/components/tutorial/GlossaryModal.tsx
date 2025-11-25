@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 import type { GlossaryEntry } from "@/lib/fheEducation";
 
 interface GlossaryModalProps {
@@ -11,6 +12,7 @@ interface GlossaryModalProps {
 }
 
 export const GlossaryModal = ({ isVisible, onClose, entries }: GlossaryModalProps) => {
+  useLockBodyScroll(isVisible);
   const [query, setQuery] = useState("");
   const [mounted, setMounted] = useState(false);
 

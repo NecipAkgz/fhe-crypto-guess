@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { CodeBlock } from "../shared/SyntaxHighlighter";
 import type { FheEducationStep } from "@/lib/fheEducation";
 import { getStageByKey } from "@/lib/fheStages";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface FHEEducationModalProps {
   step: number;
@@ -67,6 +68,7 @@ export const FHEEducationModal = ({
   onSelectStep,
   onOpenGlossary,
 }: FHEEducationModalProps) => {
+  useLockBodyScroll(isVisible);
   const [playgroundInput, setPlaygroundInput] = useState("0");
   const [quizSelections, setQuizSelections] = useState<Record<number, number>>({});
   const [mounted, setMounted] = useState(false);

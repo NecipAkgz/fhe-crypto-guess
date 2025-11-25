@@ -1,6 +1,7 @@
 import { CodeBlock } from '../shared/SyntaxHighlighter';
 import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface SmartContractModalProps {
   step: number;
@@ -95,6 +96,7 @@ export const SmartContractModal = ({
   hasNext,
   hasPrevious
 }: SmartContractModalProps) => {
+  useLockBodyScroll(isVisible);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

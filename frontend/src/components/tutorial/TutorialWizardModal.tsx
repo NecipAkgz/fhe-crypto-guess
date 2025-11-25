@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface TutorialWizardModalProps {
   isVisible: boolean;
@@ -44,6 +45,7 @@ export const TutorialWizardModal = ({
   onSkip,
   onAction
 }: TutorialWizardModalProps) => {
+  useLockBodyScroll(isVisible);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

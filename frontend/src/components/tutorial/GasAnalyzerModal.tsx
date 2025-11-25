@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface GasAnalyzerModalProps {
   isVisible: boolean;
@@ -15,6 +16,7 @@ const OPERATIONS = [
 ];
 
 export const GasAnalyzerModal = ({ isVisible, onClose }: GasAnalyzerModalProps) => {
+  useLockBodyScroll(isVisible);
   const [mounted, setMounted] = useState(false);
   const [selectedOp, setSelectedOp] = useState(OPERATIONS[0]);
   const [txCount, setTxCount] = useState(1);

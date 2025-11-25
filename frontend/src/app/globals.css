@@ -47,6 +47,13 @@
     from { background-position: 0 0; }
     to { background-position: -200% 0; }
   }
+
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+
+  --animate-scan: scan 3s linear infinite;
 }
 
 body {

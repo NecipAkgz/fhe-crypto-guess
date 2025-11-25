@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 
 interface FHEPlaygroundModalProps {
@@ -8,6 +9,7 @@ interface FHEPlaygroundModalProps {
 }
 
 export const FHEPlaygroundModal = ({ isVisible, onClose }: FHEPlaygroundModalProps) => {
+  useLockBodyScroll(isVisible);
   const [mounted, setMounted] = useState(false);
   const [inputA, setInputA] = useState<number>(5);
   const [inputB, setInputB] = useState<number>(3);

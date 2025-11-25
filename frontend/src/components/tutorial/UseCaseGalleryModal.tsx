@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
 
 interface UseCaseGalleryModalProps {
   isVisible: boolean;
@@ -119,6 +120,7 @@ const USE_CASES = [
 ];
 
 export const UseCaseGalleryModal = ({ isVisible, onClose }: UseCaseGalleryModalProps) => {
+  useLockBodyScroll(isVisible);
   const [mounted, setMounted] = useState(false);
   const [selectedCase, setSelectedCase] = useState(USE_CASES[0]);
 

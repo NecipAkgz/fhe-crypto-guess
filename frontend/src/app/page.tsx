@@ -4,35 +4,11 @@ import { useRef } from "react";
 import GameBoard, { type GameBoardHandle } from "@/components/GameBoard";
 import { FHE_EDUCATION_STEPS } from "@/lib/fheEducation";
 
-const steps = [
-  {
-    title: "Connect Wallet",
-    description: "Link your wallet to enable secure signing.",
-  },
-  {
-    title: "Start Session",
-    description: "Initialize an encrypted game session.",
-  },
-  {
-    title: "Make Move",
-    description: "Pick Rock, Paper, or Scissors privately.",
-  },
-  {
-    title: "Reveal Result",
-    description: "Decrypt the outcome locally.",
-  },
-];
-
 const highlights = [
   {
     icon: "🔒",
     label: "Sealed Inputs",
     detail: "Client-side FHE keeps every move private until you decrypt.",
-  },
-  {
-    icon: "⚖️",
-    label: "Provable Fairness",
-    detail: "Smart contracts compute blindly while remaining audit-friendly.",
   },
   {
     icon: "⚙️",
@@ -43,6 +19,11 @@ const highlights = [
     icon: "🧪",
     label: "Encrypted UX",
     detail: "Inspect game flow without leaking plaintext intent.",
+  },
+  {
+    icon: "⚡",
+    label: "Zama Powered",
+    detail: "Built on the fhEVM protocol for EVM-compatible privacy.",
   },
 ];
 
@@ -90,7 +71,7 @@ export default function Home() {
         <div className="grid gap-8 lg:grid-cols-[1fr_400px] lg:items-start animate-slide-up" style={{ animationDelay: "0.2s" }}>
           {/* Game Board Area */}
           <div className="relative z-10">
-            <GameBoard ref={gameBoardRef} steps={steps} />
+            <GameBoard ref={gameBoardRef} />
           </div>
 
           {/* Mission Control / Onboarding */}
