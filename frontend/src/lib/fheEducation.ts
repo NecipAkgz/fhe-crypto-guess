@@ -266,4 +266,32 @@ export const FHE_GLOSSARY: GlossaryEntry[] = [
     term: "Bootstrapping",
     definition: "A costly FHE procedure that refreshes ciphertext noise so additional homomorphic operations remain accurate.",
   },
+  {
+    term: "Plaintext",
+    definition: "The original, unencrypted input data (e.g., a number or boolean) before it is transformed into ciphertext.",
+  },
+  {
+    term: "Noise",
+    definition: "Random data added during encryption to ensure security. It grows with every operation and must be managed via bootstrapping.",
+  },
+  {
+    term: "Evaluation Key",
+    definition: "A special public key that allows the network (or server) to perform homomorphic operations, such as bootstrapping, on ciphertexts.",
+  },
+  {
+    term: "TFHE",
+    definition: "Torus Fully Homomorphic Encryption; a fast FHE scheme optimized for boolean and integer arithmetic, used by Zama.",
+  },
+  {
+    term: "fhEVM",
+    definition: "An EVM extension that integrates FHE capabilities, allowing smart contracts to compute on encrypted data natively.",
+  },
+  {
+    term: "Homomorphic Addition",
+    definition: "An operation where adding two ciphertexts results in a new ciphertext that decrypts to the sum of the original plaintexts.",
+  },
+  {
+    term: "Re-encryption",
+    definition: "The process of securely converting a ciphertext from the network's key to the user's key so they can decrypt the result.",
+  },
 ];

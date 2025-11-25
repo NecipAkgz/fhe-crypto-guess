@@ -1,0 +1,5 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="128" fill="#030712"/>
+  <path d="M256 100C200.77 100 156 144.77 156 200V260H136C113.91 260 96 277.91 96 300V440C96 462.09 113.91 480 136 480H376C398.09 480 416 462.09 416 440V300C416 277.91 398.09 260 376 260H356V200C356 144.77 311.23 100 256 100ZM256 140C289.14 140 316 166.86 316 200V260H196V200C196 166.86 222.86 140 256 140Z" fill="#38bdf8"/>
+  <text x="256" y="420" font-family="Arial, sans-serif" font-size="180" font-weight="bold" fill="#a855f7" text-anchor="middle">?</text>
+</svg>

@@ -4,7 +4,8 @@ export const checkFhevmStatus = async (): Promise<boolean> => {
   return true;
 };
 
-export const checkContractStatus = async (contractAddress: string): Promise<boolean> => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const checkContractStatus = async (_contractAddress: string): Promise<boolean> => {
   // Always return true to skip contract status check
   return true;
 };

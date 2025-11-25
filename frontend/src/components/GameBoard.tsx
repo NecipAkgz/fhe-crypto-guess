@@ -12,6 +12,10 @@ import { FrontendIntegrationModal } from './tutorial/FrontendIntegrationModal';
 import { DeploymentTestingModal } from './tutorial/DeploymentTestingModal';
 import { GlossaryModal } from './tutorial/GlossaryModal';
 import { TutorialWizardModal } from './tutorial/TutorialWizardModal';
+import { FHEPlaygroundModal } from './tutorial/FHEPlaygroundModal';
+import { SecurityModal } from './tutorial/SecurityModal';
+import { GasAnalyzerModal } from './tutorial/GasAnalyzerModal';
+import { UseCaseGalleryModal } from './tutorial/UseCaseGalleryModal';
 import { FHE_PROGRESS_STAGES, getStageByKey, type FheStage, type FheStageKey } from "@/lib/fheStages";
 import { FHE_EDUCATION_STEPS, FHE_GLOSSARY } from "@/lib/fheEducation";
 
@@ -156,6 +160,10 @@ export type GameBoardHandle = {
   openFrontendModal: () => void;
   openDeploymentModal: () => void;
   openGlossaryModal: () => void;
+  openPlaygroundModal: () => void;
+  openSecurityModal: () => void;
+  openGasAnalyzerModal: () => void;
+  openUseCaseGalleryModal: () => void;
 };
 
 const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
@@ -185,6 +193,13 @@ const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
   const [showFrontendModal, setShowFrontendModal] = useState(false);
   const [showDeploymentModal, setShowDeploymentModal] = useState(false);
   const [showGlossaryModal, setShowGlossaryModal] = useState(false);
+
+  // New Education Modals
+  const [showPlaygroundModal, setShowPlaygroundModal] = useState(false);
+  const [showSecurityModal, setShowSecurityModal] = useState(false);
+  const [showGasAnalyzerModal, setShowGasAnalyzerModal] = useState(false);
+  const [showUseCaseGalleryModal, setShowUseCaseGalleryModal] = useState(false);
+
   const [currentEnvStep, setCurrentEnvStep] = useState(1);
   const [currentContractStep, setCurrentContractStep] = useState(1);
   const [currentFrontendStep, setCurrentFrontendStep] = useState(1);
@@ -373,6 +388,10 @@ const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
     openFrontendModal: () => setShowFrontendModal(true),
     openDeploymentModal: () => setShowDeploymentModal(true),
     openGlossaryModal: () => setShowGlossaryModal(true),
+    openPlaygroundModal: () => setShowPlaygroundModal(true),
+    openSecurityModal: () => setShowSecurityModal(true),
+    openGasAnalyzerModal: () => setShowGasAnalyzerModal(true),
+    openUseCaseGalleryModal: () => setShowUseCaseGalleryModal(true),
   }));
 
   const resetStageProgress = useCallback(() => {
@@ -576,6 +595,24 @@ const GameBoard = forwardRef<GameBoardHandle, { steps: HowItWorksStep[] }>(
         onPrevious={prevDeploymentStep}
         hasNext={currentDeploymentStep < 4}
         hasPrevious={currentDeploymentStep > 1}
+      />
+
+      {/* New Education Modals */}
+      <FHEPlaygroundModal
+        isVisible={showPlaygroundModal}
+        onClose={() => setShowPlaygroundModal(false)}
+      />
+      <SecurityModal
+        isVisible={showSecurityModal}
+        onClose={() => setShowSecurityModal(false)}
+      />
+      <GasAnalyzerModal
+        isVisible={showGasAnalyzerModal}
+        onClose={() => setShowGasAnalyzerModal(false)}
+      />
+      <UseCaseGalleryModal
+        isVisible={showUseCaseGalleryModal}
+        onClose={() => setShowUseCaseGalleryModal(false)}
       />
 
       {/* Tutorial Wizard Component */}

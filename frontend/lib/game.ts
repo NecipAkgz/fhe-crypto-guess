@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { initFhevm } from "./fhevm";
+
 import { getContract } from "./contracts";
 import { checkAllServices, type ServiceStatus } from "./serviceStatus";
 import { CONTRACT_ADDRESS } from "@/constants/fhevm";

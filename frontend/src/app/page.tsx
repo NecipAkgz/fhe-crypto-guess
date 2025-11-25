@@ -172,12 +172,46 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
+
+                <div className="space-y-3 pt-4 border-t border-slate-800/50">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Advanced Labs</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => gameBoardRef.current?.openPlaygroundModal()}
+                      className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
+                    >
+                      <span className="text-2xl">🧪</span>
+                      <div className="text-xs font-semibold text-slate-200">Playground</div>
+                    </button>
+                    <button
+                      onClick={() => gameBoardRef.current?.openSecurityModal()}
+                      className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
+                    >
+                      <span className="text-2xl">🛡️</span>
+                      <div className="text-xs font-semibold text-slate-200">Security</div>
+                    </button>
+                    <button
+                      onClick={() => gameBoardRef.current?.openGasAnalyzerModal()}
+                      className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
+                    >
+                      <span className="text-2xl">⛽</span>
+                      <div className="text-xs font-semibold text-slate-200">Gas Analyzer</div>
+                    </button>
+                    <button
+                      onClick={() => gameBoardRef.current?.openUseCaseGalleryModal()}
+                      className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
+                    >
+                      <span className="text-2xl">🏛️</span>
+                      <div className="text-xs font-semibold text-slate-200">Use Cases</div>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className="glass rounded-2xl p-5 text-center">
               <p className="text-xs font-medium text-slate-400">
-                Privacy is not an option, it's the default.
+                Privacy is not an option, it&apos;s the default.
               </p>
             </div>
           </aside>

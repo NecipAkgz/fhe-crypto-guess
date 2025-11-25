@@ -4,7 +4,8 @@ export const checkFhevmStatus = async (): Promise<boolean> => {
   return true;
 };
 
-export const checkContractStatus = async (contractAddress: string): Promise<boolean> => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const checkContractStatus = async (_contractAddress: string): Promise<boolean> => {
   // Skip remote checks in the demo experience
   return true;
 };
@@ -15,7 +16,8 @@ export type ServiceStatus = {
   demoMode: boolean;
 };
 
-export const checkAllServices = async (contractAddress: string): Promise<ServiceStatus> => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const checkAllServices = async (_contractAddress: string): Promise<ServiceStatus> => {
   // Mark every dependency as live for the guided walkthrough
   const fhevm = true;
   const contract = true;

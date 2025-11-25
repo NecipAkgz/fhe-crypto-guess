@@ -36,55 +36,64 @@ export const GlossaryModal = ({ isVisible, onClose, entries }: GlossaryModalProp
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur p-4"
       onClick={onClose}
     >
       <div
-        className="mx-4 w-full max-w-3xl rounded-3xl border border-slate-800/70 bg-slate-950/90 p-10 shadow-[0_60px_140px_-60px_rgba(15,23,42,0.9)]"
+        className="relative flex max-h-[80vh] w-full max-w-2xl flex-col rounded-3xl border border-slate-800/70 bg-slate-950/90 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="mb-6 flex items-center justify-between">
+        <header className="flex flex-none items-center justify-between border-b border-slate-800/50 px-6 py-5">
           <div>
-            <h3 className="text-xl font-semibold text-slate-100">FHE Glossary</h3>
-            <p className="text-sm text-slate-400">Skim through the core terminology in seconds.</p>
+            <h3 className="text-lg font-semibold text-slate-100">FHE Glossary</h3>
+            <p className="text-xs text-slate-400">Key terms you should know.</p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full border border-slate-800/70 px-3 py-1 text-sm font-semibold text-slate-300 transition hover:border-slate-600/60 hover:text-slate-100"
+            className="rounded-full border border-slate-800/70 px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:border-slate-600/60 hover:text-slate-200"
           >
             Close
           </button>
         </header>
 
-        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/40 px-4 py-3">
-          <span className="text-xl">🔍</span>
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search terms (e.g. ciphertext)"
-            className="w-full bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-500"
-          />
+        <div className="flex-none px-6 py-4">
+          <div className="flex items-center gap-3 rounded-xl border border-slate-800/70 bg-slate-900/40 px-3 py-2.5">
+            <span className="text-lg text-slate-500">🔍</span>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search terms..."
+              className="w-full bg-transparent text-sm text-slate-200 outline-none placeholder:text-slate-600"
+            />
+          </div>
         </div>
 
-        <div className="max-h-[22rem] space-y-4 overflow-y-auto pr-2 text-sm">
-          {filteredEntries.length === 0 ? (
-            <p className="rounded-2xl border border-slate-800/60 bg-slate-900/60 px-4 py-6 text-center text-slate-400">
-              No matching terms found. Try a different keyword.
-            </p>
-          ) : (
-            filteredEntries.map((entry) => (
-              <div
-                key={entry.term}
-                className="rounded-2xl border border-slate-800/60 bg-slate-900/60 px-5 py-4"
-              >
-                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-slate-400">
-                  {entry.term}
-                </p>
-                <p className="mt-2 text-slate-200">{entry.definition}</p>
-              </div>
-            ))
-          )}
+        <div className="flex-1 overflow-y-auto px-6 pb-6">
+          <div className="space-y-2.5">
+            {filteredEntries.length === 0 ? (
+              <p className="rounded-xl border border-slate-800/60 bg-slate-900/60 px-4 py-8 text-center text-sm text-slate-500">
+                No matching terms found.
+              </p>
+            ) : (
+              filteredEntries.map((entry) => (
+                <div
+                  key={entry.term}
+                  className="group rounded-xl border border-slate-800/40 bg-slate-900/20 px-4 py-3 transition-all hover:border-slate-700/50 hover:bg-slate-900/40"
+                >
+                  <p className="mb-1 text-xs font-bold uppercase tracking-wider text-sky-500/90">
+                    {entry.term}
+                  </p>
+                  <p className="text-sm leading-relaxed text-slate-300 group-hover:text-slate-200">
+                    {entry.definition}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
         </div>
+
+        {/* Bottom fade to indicate scrolling */}
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-slate-950 to-transparent rounded-b-3xl" />
       </div>
     </div>,
     document.body
