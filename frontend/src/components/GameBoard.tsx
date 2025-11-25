@@ -170,7 +170,7 @@ export type GameBoardHandle = {
 
 const GameBoard = forwardRef<GameBoardHandle, unknown>(
   (_props, ref) => {
-  const { address, isConnected, connectWallet } = useWallet();
+  const { address, isConnected, connectWallet, disconnect } = useWallet();
   const [gameId, setGameId] = useState<number | null>(null);
   const [result, setResult] = useState<{won: boolean, choice: number} | null>(null);
   const [loading, setLoading] = useState(false);
@@ -633,11 +633,31 @@ const GameBoard = forwardRef<GameBoardHandle, unknown>(
               </div>
               <span className="text-xs font-bold tracking-widest text-slate-400 uppercase">System Online</span>
             </div>
-            {isClient && serviceStatus && (
-               <div className={`flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold ${demoMode ? "text-amber-400" : "text-emerald-400"}`}>
-                 <span>{demoMode ? "⚠️ Demo Mode" : "⚡ FHEVM Network"}</span>
-               </div>
-            )}
+
+            <div className="flex items-center gap-4">
+              {isClient && serviceStatus && (
+                 <div className={`flex items-center gap-2 text-[10px] uppercase tracking-wider font-bold ${demoMode ? "text-amber-400" : "text-emerald-400"}`}>
+                   <span>{demoMode ? "⚠️ Demo Mode" : "⚡ FHEVM Network"}</span>
+                 </div>
+              )}
+
+              {isConnected && address && (
+                <div className="flex items-center gap-3 pl-4 border-l border-slate-800">
+                  <div className="flex items-center gap-2 bg-slate-900/80 rounded-full px-3 py-1 border border-slate-700">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                    <span className="text-[10px] font-mono text-slate-300">
+                      {address.slice(0, 6)}...{address.slice(-4)}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => disconnect()}
+                    className="text-[10px] font-bold text-rose-400 hover:text-rose-300 transition-colors uppercase tracking-wider"
+                  >
+                    Disconnect
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Dynamic Stepper */}
