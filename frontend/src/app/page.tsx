@@ -60,13 +60,7 @@ export default function Home() {
       <div className="relative mx-auto flex max-w-7xl flex-col gap-12 px-4 py-12 sm:px-6 lg:px-8">
         {/* Header Section */}
         <header className="flex flex-col items-center gap-6 text-center animate-fade-in">
-          <div className="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-4 py-1.5 text-xs font-semibold text-sky-300 backdrop-blur-md">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-            </span>
-            Powered by Zama FHEVM
-          </div>
+
 
           <div className="space-y-4 max-w-3xl">
             <h1 className="text-5xl font-bold tracking-tight sm:text-5xl bg-gradient-to-b from-white via-slate-200 to-slate-400 bg-clip-text text-transparent drop-shadow-sm">
@@ -82,7 +76,7 @@ export default function Home() {
             {highlights.map(({ icon, label, detail }) => (
               <div
                 key={label}
-                className="group relative inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/50 px-4 py-2 font-medium text-slate-300 transition-all hover:border-sky-500/30 hover:bg-sky-500/10 cursor-help"
+                className="group relative inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/50 px-4 py-1 font-medium text-slate-300 transition-all hover:border-sky-500/30 hover:bg-sky-500/10 cursor-help"
                 title={detail}
               >
                 <span className="text-base group-hover:scale-110 transition-transform">{icon}</span>
