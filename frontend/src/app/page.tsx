@@ -76,110 +76,108 @@ export default function Home() {
 
           {/* Mission Control / Onboarding */}
           <aside className="space-y-6 lg:sticky lg:top-8">
-            <div className="glass-card rounded-3xl p-1">
-              <div className="rounded-[22px] bg-slate-950/50 p-6 space-y-6">
-                <div>
-                  <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-sky-400">
-                    <span className="h-px w-4 bg-sky-400/50"></span>
-                    Mission Control
-                  </h2>
-                  <p className="mt-2 text-sm text-slate-400">
-                    Master the concepts of FHE through interactive modules.
-                  </p>
-                </div>
+            <div className="glass-card rounded-3xl p-6 space-y-6">
+              <div>
+                <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-sky-400">
+                  <span className="h-px w-4 bg-sky-400/50"></span>
+                  Mission Control
+                </h2>
+                <p className="mt-2 text-sm text-slate-400">
+                  Master the concepts of FHE through interactive modules.
+                </p>
+              </div>
 
-                <div className="space-y-3">
+              <div className="space-y-3">
+                <button
+                  onClick={() => gameBoardRef.current?.startTutorial()}
+                  className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 p-[1px] transition-all hover:shadow-[0_0_20px_rgba(14,165,233,0.3)]"
+                >
+                  <div className="relative flex items-center gap-3 rounded-[11px] bg-slate-950/40 px-4 py-3 transition-colors group-hover:bg-transparent">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-lg">🚀</span>
+                    <div className="text-left">
+                      <div className="font-semibold text-white">Interactive Tutorial</div>
+                      <div className="text-xs text-slate-300">Start your FHE journey here</div>
+                    </div>
+                  </div>
+                </button>
+
+                <div className="grid grid-cols-2 gap-2">
                   <button
-                    onClick={() => gameBoardRef.current?.startTutorial()}
-                    className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 p-[1px] transition-all hover:shadow-[0_0_20px_rgba(14,165,233,0.3)]"
+                    onClick={() => gameBoardRef.current?.showEducation(1)}
+                    className="glass-button flex flex-col items-start gap-2 rounded-xl p-3 text-left hover:bg-slate-800/50"
                   >
-                    <div className="relative flex items-center gap-3 rounded-[11px] bg-slate-950/40 px-4 py-3 transition-colors group-hover:bg-transparent">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-lg">🚀</span>
-                      <div className="text-left">
-                        <div className="font-semibold text-white">Interactive Tutorial</div>
-                        <div className="text-xs text-slate-300">Start your FHE journey here</div>
-                      </div>
+                    <span className="text-xl">📚</span>
+                    <div>
+                      <div className="text-xs font-semibold text-slate-200">FHE Essentials</div>
+                      <div className="text-[10px] text-slate-400">{FHE_EDUCATION_STEPS.length} Steps</div>
                     </div>
                   </button>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => gameBoardRef.current?.showEducation(1)}
-                      className="glass-button flex flex-col items-start gap-2 rounded-xl p-3 text-left hover:bg-slate-800/50"
-                    >
-                      <span className="text-xl">📚</span>
-                      <div>
-                        <div className="text-xs font-semibold text-slate-200">FHE Essentials</div>
-                        <div className="text-[10px] text-slate-400">{FHE_EDUCATION_STEPS.length} Steps</div>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => gameBoardRef.current?.openGlossaryModal()}
-                      className="glass-button flex flex-col items-start gap-2 rounded-xl p-3 text-left hover:bg-slate-800/50"
-                    >
-                      <span className="text-xl">🧠</span>
-                      <div>
-                        <div className="text-xs font-semibold text-slate-200">Glossary</div>
-                        <div className="text-[10px] text-slate-400">Key terms</div>
-                      </div>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => gameBoardRef.current?.openGlossaryModal()}
+                    className="glass-button flex flex-col items-start gap-2 rounded-xl p-3 text-left hover:bg-slate-800/50"
+                  >
+                    <span className="text-xl">🧠</span>
+                    <div>
+                      <div className="text-xs font-semibold text-slate-200">Glossary</div>
+                      <div className="text-[10px] text-slate-400">Key terms</div>
+                    </div>
+                  </button>
                 </div>
+              </div>
 
-                <div className="space-y-3 pt-4 border-t border-slate-800/50">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Deep Dive Modules</p>
-                  <div className="grid gap-2">
-                    {[
-                      { label: "Environment Setup", action: () => gameBoardRef.current?.openEnvironmentModal(), icon: "🛠️" },
-                      { label: "Write Contract", action: () => gameBoardRef.current?.openContractModal(), icon: "📝" },
-                      { label: "Frontend Integration", action: () => gameBoardRef.current?.openFrontendModal(), icon: "🎨" },
-                      { label: "Deploy & Test", action: () => gameBoardRef.current?.openDeploymentModal(), icon: "⚡" },
-                    ].map((item) => (
-                      <button
-                        key={item.label}
-                        onClick={item.action}
-                        className="flex items-center gap-3 rounded-lg border border-slate-800/50 bg-slate-900/30 px-3 py-2.5 text-sm font-medium text-slate-300 transition-all hover:border-sky-500/30 hover:bg-sky-500/10 hover:text-sky-200"
-                      >
-                        <span className="opacity-70">{item.icon}</span>
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
+              <div className="space-y-3 pt-4 border-t border-slate-800/50">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Deep Dive Modules</p>
+                <div className="grid gap-2">
+                  {[
+                    { label: "Environment Setup", action: () => gameBoardRef.current?.openEnvironmentModal(), icon: "🛠️" },
+                    { label: "Write Contract", action: () => gameBoardRef.current?.openContractModal(), icon: "📝" },
+                    { label: "Frontend Integration", action: () => gameBoardRef.current?.openFrontendModal(), icon: "🎨" },
+                    { label: "Deploy & Test", action: () => gameBoardRef.current?.openDeploymentModal(), icon: "⚡" },
+                  ].map((item) => (
+                    <button
+                      key={item.label}
+                      onClick={item.action}
+                      className="flex items-center gap-3 rounded-lg border border-slate-800/50 bg-slate-900/30 px-3 py-2.5 text-sm font-medium text-slate-300 transition-all hover:border-sky-500/30 hover:bg-sky-500/10 hover:text-sky-200"
+                    >
+                      <span className="opacity-70">{item.icon}</span>
+                      {item.label}
+                    </button>
+                  ))}
                 </div>
+              </div>
 
-                <div className="space-y-3 pt-4 border-t border-slate-800/50">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Advanced Labs</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      onClick={() => gameBoardRef.current?.openPlaygroundModal()}
-                      className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
-                    >
-                      <span className="text-2xl">🧪</span>
-                      <div className="text-xs font-semibold text-slate-200">Playground</div>
-                    </button>
-                    <button
-                      onClick={() => gameBoardRef.current?.openSecurityModal()}
-                      className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
-                    >
-                      <span className="text-2xl">🛡️</span>
-                      <div className="text-xs font-semibold text-slate-200">Security</div>
-                    </button>
-                    <button
-                      onClick={() => gameBoardRef.current?.openGasAnalyzerModal()}
-                      className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
-                    >
-                      <span className="text-2xl">⛽</span>
-                      <div className="text-xs font-semibold text-slate-200">Gas Analyzer</div>
-                    </button>
-                    <button
-                      onClick={() => gameBoardRef.current?.openUseCaseGalleryModal()}
-                      className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
-                    >
-                      <span className="text-2xl">🏛️</span>
-                      <div className="text-xs font-semibold text-slate-200">Use Cases</div>
-                    </button>
-                  </div>
+              <div className="space-y-3 pt-4 border-t border-slate-800/50">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Advanced Labs</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => gameBoardRef.current?.openPlaygroundModal()}
+                    className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
+                  >
+                    <span className="text-2xl">🧪</span>
+                    <div className="text-xs font-semibold text-slate-200">Playground</div>
+                  </button>
+                  <button
+                    onClick={() => gameBoardRef.current?.openSecurityModal()}
+                    className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
+                  >
+                    <span className="text-2xl">🛡️</span>
+                    <div className="text-xs font-semibold text-slate-200">Security</div>
+                  </button>
+                  <button
+                    onClick={() => gameBoardRef.current?.openGasAnalyzerModal()}
+                    className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
+                  >
+                    <span className="text-2xl">⛽</span>
+                    <div className="text-xs font-semibold text-slate-200">Gas Analyzer</div>
+                  </button>
+                  <button
+                    onClick={() => gameBoardRef.current?.openUseCaseGalleryModal()}
+                    className="glass-button flex flex-col items-center gap-2 rounded-xl p-3 text-center hover:bg-slate-800/50"
+                  >
+                    <span className="text-2xl">🏛️</span>
+                    <div className="text-xs font-semibold text-slate-200">Use Cases</div>
+                  </button>
                 </div>
               </div>
             </div>
