@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { GlossaryEntry } from "@/lib/fheEducation";
 
 interface GlossaryModalProps {
@@ -11,6 +12,12 @@ interface GlossaryModalProps {
 
 export const GlossaryModal = ({ isVisible, onClose, entries }: GlossaryModalProps) => {
   const [query, setQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   const filteredEntries = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -23,11 +30,11 @@ export const GlossaryModal = ({ isVisible, onClose, entries }: GlossaryModalProp
     );
   }, [entries, query]);
 
-  if (!isVisible) {
+  if (!isVisible || !mounted) {
     return null;
   }
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur"
       onClick={onClose}
@@ -79,6 +86,7 @@ export const GlossaryModal = ({ isVisible, onClose, entries }: GlossaryModalProp
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

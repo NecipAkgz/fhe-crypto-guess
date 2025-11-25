@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { CodeBlock } from "../shared/SyntaxHighlighter";
 import type { FheEducationStep } from "@/lib/fheEducation";
 import { getStageByKey } from "@/lib/fheStages";
@@ -68,6 +69,12 @@ export const FHEEducationModal = ({
 }: FHEEducationModalProps) => {
   const [playgroundInput, setPlaygroundInput] = useState("0");
   const [quizSelections, setQuizSelections] = useState<Record<number, number>>({});
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   useEffect(() => {
     if (!isVisible) {
@@ -111,11 +118,11 @@ export const FHEEducationModal = ({
     onSelectStep?.(targetStep);
   };
 
-  if (!isVisible || !currentStep) {
+  if (!isVisible || !currentStep || !mounted) {
     return null;
   }
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur"
       onClick={onClose}
@@ -326,6 +333,7 @@ export const FHEEducationModal = ({
           </div>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

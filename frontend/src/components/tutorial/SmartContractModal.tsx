@@ -1,4 +1,6 @@
 import { CodeBlock } from '../shared/SyntaxHighlighter';
+import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
 
 interface SmartContractModalProps {
   step: number;
@@ -93,11 +95,18 @@ export const SmartContractModal = ({
   hasNext,
   hasPrevious
 }: SmartContractModalProps) => {
-  if (!isVisible) return null;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  if (!isVisible || !mounted) return null;
 
   const currentStep = contractSteps[step - 1];
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur"
       onClick={onClose}
@@ -184,6 +193,7 @@ export const SmartContractModal = ({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
